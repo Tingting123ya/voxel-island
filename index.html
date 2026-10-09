@@ -1049,3 +1049,216 @@
   </script>
 </body>
 </html>
+// ==========================================
+// 1. 瀏覽器語音辨識模組 (Web Speech API)
+// ==========================================
+const SpeechRec = {
+  recognition: null,
+  isListening: false,
+  timer: null,
+
+  init() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn("此瀏覽器不支援 Web Speech API，將自動啟用按鈕點擊跟讀模式。");
+      return false;
+    }
+    this.recognition = new SpeechRecognition();
+    this.recognition.lang = 'en-US';        // 美式英文辨識
+    this.recognition.continuous = false;    // 說完一句即結束
+    this.recognition.interimResults = false;// 僅返回最終穩定結果
+    this.recognition.maxAlternatives = 3;   // 保留多個候選詞以提高兒童容錯率
+    return true;
+  },
+
+  listen(targetWord, onSuccess, onFail) {
+    if (!this.recognition && !this.init()) {
+      if (onFail) onFail("裝置未支援麥克風辨識，請使用按鈕跟讀！");
+      return;
+    }
+
+    const indicator = document.getElementById('mic-indicator');
+
+    this.recognition.onstart = () => {
+      this.isListening = true;
+      if (indicator) indicator.innerText = `🎙️ 聆聽中... 請大聲念出：「${targetWord}」！`;
+      
+      // 8 秒逾時防卡死保護
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        if (this.isListening) {
+          try { this.recognition.stop(); } catch (e) {}
+          if (onFail) onFail("沒聽清楚，請靠近麥克風再試一次！");
+        }
+      }, 8000);
+    };
+
+    this.recognition.onresult = (event) => {
+      clearTimeout(this.timer);
+      this.isListening = false;
+      
+      // 提取候選詞清單進行模糊比對
+      const results = Array.from(event.results[0]).map(r => r.transcript.trim().toLowerCase());
+      const target = targetWord.trim().toLowerCase();
+      
+      const matched = results.some(text => text.includes(target));
+      if (matched) {
+        onSuccess(results[0]);
+      } else {
+        onFail(`聽到了：「${results[0]}」，差一點點，再念一次試試看！`);
+      }
+    };
+
+    this.recognition.onerror = (e) => {
+      clearTimeout(this.timer);
+      this.isListening = false;
+      if (onFail) onFail("收音中斷或未取得麥克風權限，請點擊重試！");
+    };
+
+    this.recognition.onend = () => {
+      this.isListening = false;
+    };
+
+    try {
+      this.recognition.start();
+    } catch (e) {
+      this.recognition.stop();
+    }
+  }
+};
+
+// ==========================================
+// 2. 完整 10 關冒險資料庫 (QUEST_LIST)
+// ==========================================
+const QUEST_LIST = [
+  {
+    id: 1,
+    title: "Stage 1: Hello Guide Bear",
+    targetWord: "Hello",
+    phonics: "H - E - L - L - O",
+    sentence: "Hello! What is your name?",
+    expectedReply: "I am Tingting",
+    chinesePrompt: "你好！勇敢的探險家，你叫什麼名字？",
+    npcMessage: "Say: 'Hello!' to wake up the island!",
+    rewardType: "badge_welcome",
+    location: { x: -5, z: 2 },
+    icon: "🐻"
+  },
+  {
+    id: 2,
+    title: "Stage 2: Fresh Apples",
+    targetWord: "Apple",
+    phonics: "A - P - P - L - E",
+    sentence: "Look at the tree! Pick a sweet Apple.",
+    expectedReply: "Apple",
+    chinesePrompt: "果樹結實纍纍，摘下一顆好吃的紅蘋果吧！",
+    npcMessage: "Look at the red fruit and say: 'Apple'!",
+    rewardType: "item_apple",
+    location: { x: -12, z: -8 },
+    icon: "🍎"
+  },
+  {
+    id: 3,
+    title: "Stage 3: Color Meadow",
+    targetWord: "Yellow",
+    phonics: "Y - E - L - L - O - W",
+    sentence: "The sheep likes Yellow flowers.",
+    expectedReply: "Yellow",
+    chinesePrompt: "小綿羊肚子餓了，送給牠一朵黃色的花！",
+    npcMessage: "Find the yellow flower and say: 'Yellow'!",
+    rewardType: "flower_yellow",
+    location: { x: -8, z: 12 },
+    icon: "🌼"
+  },
+  {
+    id: 4,
+    title: "Stage 4: Bunny Hop",
+    targetWord: "Rabbit",
+    phonics: "R - A - B - B - I - T",
+    sentence: "Hop, hop! A cute white Rabbit is here.",
+    expectedReply: "Rabbit",
+    chinesePrompt: "草地上有一隻蹦蹦跳跳的白兔！",
+    npcMessage: "Look at the cute pet and say: 'Rabbit'!",
+    rewardType: "pet_bunny",
+    location: { x: -14, z: 6 },
+    icon: "🐰"
+  },
+  {
+    id: 5,
+    title: "Stage 5: Number Bridge",
+    targetWord: "Three",
+    phonics: "T - H - R - E - E",
+    sentence: "We need Three stepping stones to cross the river.",
+    expectedReply: "Three",
+    chinesePrompt: "小溪上的木橋缺了踏板，念出數字鋪設 3 塊木板！",
+    npcMessage: "Count the stones: One, Two, Three!",
+    rewardType: "bridge_fix",
+    location: { x: 0, z: 0 },
+    icon: "🌉"
+  },
+  {
+    id: 6,
+    title: "Stage 6: Bakery Break",
+    targetWord: "Milk",
+    phonics: "M - I - L - K",
+    sentence: "May I have a glass of Milk, please?",
+    expectedReply: "Milk",
+    chinesePrompt: "口渴了嗎？在小木桌旁點一杯營養的牛奶吧！",
+    npcMessage: "Order some drink and say: 'Milk'!",
+    rewardType: "drink_milk",
+    location: { x: 8, z: -8 },
+    icon: "🥛"
+  },
+  {
+    id: 7,
+    title: "Stage 7: Builder House",
+    targetWord: "Wood",
+    phonics: "W - O - O - D",
+    sentence: "The house needs strong Wood for the roof.",
+    expectedReply: "Wood",
+    chinesePrompt: "小屋的屋頂破掉了，我們需要木頭來修理！",
+    npcMessage: "Gather building blocks and say: 'Wood'!",
+    rewardType: "house_roof",
+    location: { x: 12, z: 2 },
+    icon: "🪵"
+  },
+  {
+    id: 8,
+    title: "Stage 8: Sunny Hill",
+    targetWord: "Sunny",
+    phonics: "S - U - N - N - Y",
+    sentence: "Look up! The weather is bright and Sunny.",
+    expectedReply: "Sunny",
+    chinesePrompt: "爬上小山丘，今天的天氣是大晴天！",
+    npcMessage: "Check the warm sky and say: 'Sunny'!",
+    rewardType: "weather_sun",
+    location: { x: 10, z: 12 },
+    icon: "☀️"
+  },
+  {
+    id: 9,
+    title: "Stage 9: Action Challenge",
+    targetWord: "Jump",
+    phonics: "J - U - M - P",
+    sentence: "Press Space or say Jump to leap forward!",
+    expectedReply: "Jump",
+    chinesePrompt: "前方有一道小水溝，大聲念出動詞跳過去！",
+    npcMessage: "Show your energy and shout: 'Jump'!",
+    rewardType: "action_jump",
+    location: { x: -2, z: -12 },
+    icon: "🦘"
+  },
+  {
+    id: 10,
+    title: "Stage 10: Superstar Finale",
+    targetWord: "Star",
+    phonics: "S - T - A - R",
+    sentence: "Congratulations! You are an English Superstar!",
+    expectedReply: "Star",
+    chinesePrompt: "來到島嶼中央噴泉，念出 Star 領取你的大明星證書！",
+    npcMessage: "Finish the final quest and say: 'Star'!",
+    rewardType: "trophy_champion",
+    location: { x: 0, z: 5 },
+    icon: "⭐"
+  }
+];
