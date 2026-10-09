@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Voxel English World - 兒童體素英語冒險島</title>
+  <!-- Google Fonts 可愛字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #87ceeb;
+      font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+    }
+    #canvas3d {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* 頂部 HUD */
+    #top-hud {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .badge-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 4px solid #4a3728;
+      border-radius: 20px;
+      padding: 10px 18px;
+      box-shadow: 0 8px 0 #2e2118, 0 12px 20px rgba(0,0,0,0.25);
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .player-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .player-avatar {
+      width: 44px;
+      height: 44px;
+      background: #ffcc00;
+      border: 3px solid #4a3728;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .player-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #3e2723;
+    }
+    .player-mode-tag {
+      font-size: 12px;
+      background: #4caf50;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-weight: 700;
+      width: fit-content;
+    }
+
+    .mission-card {
+      max-width: 380px;
+    }
+    .mission-title {
+      font-size: 13px;
+      color: #ff8f00;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .mission-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2e2118;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 語音按鈕與切換 */
+    .hud-controls {
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      background: #ffecb3;
+      border: 3px solid #4a3728;
+      border-radius: 14px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #4a3728;
+      transition: transform 0.1s;
+    }
+    .icon-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #4a3728;
+    }
+
+    /* 懸浮互動提示 */
+    #interact-prompt {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 235, 59, 0.95);
+      border: 4px solid #4a3728;
+      border-radius: 50px;
+      padding: 10px 24px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #3e2723;
+      box-shadow: 0 6px 0 #4a3728;
+      display: none;
+      z-index: 15;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: translateX(-50%) scale(1); }
+      to { transform: translateX(-50%) scale(1.06); }
+    }
+
+    /* 底部手機觸控按鈕 */
+    #mobile-controls {
+      position: absolute;
+      bottom: 24px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .touch-btn {
+      pointer-events: auto;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      border: 4px solid #4a3728;
+      box-shadow: 0 6px 0 #4a3728;
+      cursor: pointer;
+      touch-action: none;
+    }
+    .touch-btn:active {
+      transform: translateY(6px);
+      box-shadow: 0 0 0 #4a3728;
+    }
+
+    /* 虛擬搖桿 */
+    #joystick-zone {
+      width: 120px;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.45);
+      border: 4px solid rgba(74, 55, 40, 0.6);
+      border-radius: 50%;
+      position: relative;
+      touch-action: none;
+      pointer-events: auto;
+    }
+    #joystick-knob {
+      width: 52px;
+      height: 52px;
+      background: #ffcc00;
+      border: 3px solid #4a3728;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 0 #4a3728;
+    }
+
+    /* 右側動作按鈕組 */
+    .action-group {
+      display: flex;
+      gap: 16px;
+    }
+    #jump-btn {
+      width: 68px;
+      height: 68px;
+      background: #42a5f5;
+      color: white;
+      font-size: 24px;
+    }
+    #action-btn {
+      width: 76px;
+      height: 76px;
+      background: #66bb6a;
+      color: white;
+      font-size: 28px;
+    }
+
+    /* 彈出對話與字卡視窗 */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .modal-box {
+      background: #fffdf5;
+      border: 6px solid #4a3728;
+      border-radius: 28px;
+      width: 100%;
+      max-width: 520px;
+      padding: 24px;
+      box-shadow: 0 12px 0 #2e2118, 0 20px 40px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: popIn 0.25s ease-out;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .modal-avatar {
+      font-size: 38px;
+      background: #ffe082;
+      border: 3px solid #4a3728;
+      border-radius: 16px;
+      padding: 4px;
+    }
+    .modal-title-area h3 {
+      font-size: 22px;
+      color: #3e2723;
+    }
+    .modal-title-area p {
+      font-size: 14px;
+      color: #795548;
+    }
+
+    .speech-bubble {
+      background: #e8f5e9;
+      border: 3px dashed #4caf50;
+      border-radius: 18px;
+      padding: 16px;
+      position: relative;
+    }
+    .english-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1b5e20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chinese-text {
+      font-size: 15px;
+      color: #43a047;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .phonics-spell {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: #e65100;
+      background: #ffe0b2;
+      padding: 6px 14px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .speaker-icon-btn {
+      background: #fff;
+      border: 2px solid #4caf50;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-choice {
+      background: #ffecb3;
+      border: 4px solid #4a3728;
+      border-radius: 18px;
+      padding: 12px 18px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #3e2723;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 0 #4a3728;
+      transition: all 0.15s;
+    }
+    .btn-choice:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #4a3728;
+    }
+    .btn-choice.correct {
+      background: #c8e6c9 !important;
+      border-color: #2e7d32 !important;
+    }
+
+    /* 模式選擇彈窗 */
+    #mode-modal .mode-selection {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .mode-card {
+      background: #fff;
+      border: 4px solid #4a3728;
+      border-radius: 20px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #4a3728;
+    }
+    .mode-card:hover {
+      background: #fffde7;
+    }
+    .mode-icon {
+      font-size: 44px;
+      margin-bottom: 8px;
+    }
+
+    /* 單字結算卡片列表 */
+    .word-summary-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .word-summary-item {
+      background: #ede7f6;
+      border: 2px solid #512da8;
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #311b92;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* 電腦操作鍵位提示 */
+    #keyboard-tip {
+      position: absolute;
+      bottom: 12px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      pointer-events: none;
+    }
+    @media (max-width: 768px) {
+      #keyboard-tip { display: none; }
+      .mission-card { max-width: 200px; }
+      .mission-text { font-size: 13px; }
+      .player-name { font-size: 15px; }
+    }
+  </style>
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <canvas id="canvas3d"></canvas>
+
+  <!-- 頂部 HUD -->
+  <div id="top-hud">
+    <div class="badge-card player-profile">
+      <div class="player-avatar">⭐</div>
+      <div>
+        <div class="player-name">Tingting123ya</div>
+        <div id="current-mode-tag" class="player-mode-tag">🐣 幼兒組 (3-6歲)</div>
+      </div>
+    </div>
+
+    <div class="badge-card mission-card">
+      <div class="mission-title">🎯 當前任務 / Current Quest</div>
+      <div id="mission-desc" class="mission-text">尋找小熊老師 (Find Bear)</div>
+    </div>
+
+    <div class="hud-controls">
+      <button class="icon-btn" id="btn-toggle-mode" title="切換分齡模式">🔄</button>
+      <button class="icon-btn" id="btn-replay-audio" title="重播任務英文">🔊</button>
+    </div>
+  </div>
+
+  <!-- 接近互動提示 (E 鍵 / 點擊按鈕) -->
+  <div id="interact-prompt">💬 按 E 或點綠色按鈕互動</div>
+
+  <!-- 鍵盤操作提示 (電腦版) -->
+  <div id="keyboard-tip">⌨️ 操作：W A S D 移動 | 空白鍵 跳躍 | E 互動</div>
+
+  <!-- 手機版虛擬搖桿與按鈕 -->
+  <div id="mobile-controls">
+    <div id="joystick-zone">
+      <div id="joystick-knob"></div>
+    </div>
+    <div class="action-group">
+      <div class="touch-btn" id="jump-btn">🦘</div>
+      <div class="touch-btn" id="action-btn">💬</div>
+    </div>
+  </div>
+
+  <!-- 彈出對話/學習視窗 -->
+  <div class="modal-overlay" id="dialog-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-avatar" id="npc-avatar">🐻</div>
+        <div class="modal-title-area">
+          <h3 id="npc-name">Guide Bear (小熊老師)</h3>
+          <p id="npc-role">English Adventure Guide</p>
+        </div>
+      </div>
+
+      <div class="speech-bubble">
+        <div class="english-text">
+          <span id="bubble-en">Hello! What is your name?</span>
+          <button class="speaker-icon-btn" id="speak-dialog-btn">🔊</button>
+        </div>
+        <div class="chinese-text" id="bubble-zh">你好！你叫什麼名字呢？</div>
+        <div id="phonics-box" style="display: none;">
+          <div class="phonics-spell" id="bubble-phonics">A - P - P - L - E</div>
+        </div>
+      </div>
+
+      <div class="options-grid" id="options-container">
+        <!-- 動態填入選項 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 關卡結算卡片 -->
+  <div class="modal-overlay" id="victory-modal" style="display: none;">
+    <div class="modal-box" style="text-align: center;">
+      <div style="font-size: 60px;">🏆🎉</div>
+      <h2 style="font-size: 28px; color: #2e7d32;">Stage Clear! 通關大成功！</h2>
+      <p style="font-size: 16px; color: #666;">你完成了所有的冒險任務，成為了小小英語大師！</p>
+      
+      <div style="text-align: left; margin: 10px 0;">
+        <h4 style="color: #4a3728; margin-bottom: 6px;">📖 本次學會的單字庫：</h4>
+        <div class="word-summary-list" id="summary-word-list">
+          <!-- 動態載入 -->
+        </div>
+      </div>
+
+      <button class="btn-choice" id="btn-replay-game" style="justify-content: center; background: #81c784;">
+        🔄 再玩一次 (Play Again)
+      </button>
+    </div>
+  </div>
+
+  <!-- 分齡選擇視窗 (幼兒 3-6 vs 學齡 7-12) -->
+  <div class="modal-overlay" id="mode-modal" style="display: flex;">
+    <div class="modal-box">
+      <div style="text-align: center;">
+        <h2 style="font-size: 26px; color: #3e2723;">選擇學習模式 / Choose Mode</h2>
+        <p style="color: #666; margin-top: 4px;">為 Tingting123ya 量身切換最合適的教學內容：</p>
+      </div>
+
+      <div class="mode-selection">
+        <div class="mode-card" id="mode-kids">
+          <div class="mode-icon">🐣</div>
+          <h3 style="color: #2e7d32; font-size: 18px;">幼兒組 (3-6 歲)</h3>
+          <p style="font-size: 13px; color: #666; margin-top: 4px;">自然發音啟蒙、顏色認知、生活單字大圖卡、聽音探索</p>
+        </div>
+        <div class="mode-card" id="mode-school">
+          <div class="mode-icon">🚀</div>
+          <h3 style="color: #1565c0; font-size: 18px;">學齡組 (7-12 歲)</h3>
+          <p style="font-size: 13px; color: #666; margin-top: 4px;">Phonics 拼讀、句子回答、生活對話問答、單字填空建造</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. 遊戲核心狀態與設定
+       ========================================================================== */
+    const GAME = {
+      mode: 'kids', // 'kids' (3-6歲) 或 'school' (7-12歲)
+      stage: 1,     // 1: 遇見小熊, 2: 採集單字, 3: 修理屋頂, 4: 通關
+      applesCollected: 0,
+      totalApples: 3,
+      learnedWords: [
+        { en: 'Hello', zh: '你好', phonics: 'H - E - L - L - O' },
+        { en: 'Apple', zh: '蘋果', phonics: 'A - P - P - L - E' },
+        { en: 'Wood', zh: '木頭', phonics: 'W - O - O - D' },
+        { en: 'House', zh: '房子', phonics: 'H - O - U - S - E' },
+        { en: 'Friend', zh: '朋友', phonics: 'F - R - I - E - N - D' }
+      ]
+    };
+
+    /* ==========================================================================
+       2. Web Audio API 音效合成器 (完全自給自足，無須外部音效庫)
+       ========================================================================== */
+    const Sound = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+      playPop() {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(700, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.12);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.12);
+      },
+      playChime() {
+        this.init();
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+        notes.forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.08);
+          gain.gain.setValueAtTime(0.25, this.ctx.currentTime + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.08 + 0.4);
+          osc.start(this.ctx.currentTime + i * 0.08);
+          osc.stop(this.ctx.currentTime + i * 0.08 + 0.4);
+        });
+      },
+      playFanfare() {
+        this.init();
+        const chords = [440, 554.37, 659.25, 880];
+        chords.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.1);
+          gain.gain.setValueAtTime(0.15, this.ctx.currentTime + idx * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.1 + 0.7);
+          osc.start(this.ctx.currentTime + idx * 0.1);
+          osc.stop(this.ctx.currentTime + idx * 0.1 + 0.7);
+        });
+      }
+    };
+
+    /* ==========================================================================
+       3. Web Speech API 兒童標準英文語音合成 (含發音拆解)
+       ========================================================================== */
+    const Speech = {
+      synth: window.speechSynthesis,
+      speak(text, rate = 0.85) {
+        if (!this.synth) return;
+        this.synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = rate; // 稍微放慢，友善適合兒童模仿
+        utter.pitch = 1.15; // 稍高一點點，活潑可愛
+        this.synth.speak(utter);
+      },
+      spellOut(word) {
+        // 自然發音/字母拼讀拆解：A - P - P - L - E
+        const letters = word.split('').join('. ');
+        this.speak(`${word}! Let's spell it: ${letters}. ${word}!`, 0.8);
+      }
+    };
+
+    /* ==========================================================================
+       4. Three.js 3D 體素世界搭建 (麥塊可愛自然島嶼)
+       ========================================================================== */
+    let scene, camera, renderer, clock;
+    let player, bearNpc, houseGroup, bridge;
+    let appleObjects = [];
+    let brokenRoofBlocks = [];
+    let butterflies = [];
+    let particles = [];
+
+    // 移動與控制變數
+    const moveState = { forward: 0, right: 0, jump: false };
+    const playerSpeed = 7.5;
+    let playerVelocityY = 0;
+    const gravity = 22;
+    let isGrounded = true;
+
+    function init3D() {
+      clock = new THREE.Clock();
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87ceeb); // 晴朗天空藍
+      scene.fog = new THREE.Fog(0x87ceeb, 28, 55);
+
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      
+      const canvas = document.getElementById('canvas3d');
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      // 太陽光與環境柔光
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+      scene.add(ambientLight);
+
+      const sunLight = new THREE.DirectionalLight(0xfff7d6, 1.1);
+      sunLight.position.set(20, 35, 15);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 1024;
+      sunLight.shadow.mapSize.height = 1024;
+      sunLight.shadow.camera.near = 1;
+      sunLight.shadow.camera.far = 80;
+      sunLight.shadow.camera.left = -25;
+      sunLight.shadow.camera.right = 25;
+      sunLight.shadow.camera.top = 25;
+      sunLight.shadow.camera.bottom = -25;
+      scene.add(sunLight);
+
+      buildWorld();
+      createPlayer();
+      createBearNPC();
+      createCollectibles();
+      setupControls();
+
+      window.addEventListener('resize', onWindowResize);
+      animate();
+    }
+
+    // 建立體素環境：草地島、泥土層、小溪、橋樑、小屋、方塊樹、花朵
+    function buildWorld() {
+      const voxelMat = {
+        grass: new THREE.MeshLambertMaterial({ color: 0x55aa33 }),
+        dirt: new THREE.MeshLambertMaterial({ color: 0x795548 }),
+        wood: new THREE.MeshLambertMaterial({ color: 0x8d6e63 }),
+        leaves: new THREE.MeshLambertMaterial({ color: 0x2e7d32 }),
+        water: new THREE.MeshLambertMaterial({ color: 0x4fc3f7, transparent: true, opacity: 0.85 }),
+        roof: new THREE.MeshLambertMaterial({ color: 0xd84315 }),
+        wall: new THREE.MeshLambertMaterial({ color: 0xfff8e1 }),
+        stone: new THREE.MeshLambertMaterial({ color: 0x9e9e9e }),
+        flowerRed: new THREE.MeshLambertMaterial({ color: 0xe91e63 }),
+        flowerYellow: new THREE.MeshLambertMaterial({ color: 0xffeb3b }),
+      };
+
+      // 主島嶼 (草皮與泥土基底)
+      const islandGeo = new THREE.BoxGeometry(42, 2, 42);
+      const island = new THREE.Mesh(islandGeo, voxelMat.grass);
+      island.position.y = -1;
+      island.receiveShadow = true;
+      scene.add(island);
+
+      const dirtGeo = new THREE.BoxGeometry(42, 6, 42);
+      const dirt = new THREE.Mesh(dirtGeo, voxelMat.dirt);
+      dirt.position.y = -5;
+      scene.add(dirt);
+
+      // 小溪河流穿越
+      const riverGeo = new THREE.BoxGeometry(7, 2.05, 42);
+      const river = new THREE.Mesh(riverGeo, voxelMat.water);
+      river.position.set(0, -0.95, 0);
+      scene.add(river);
+
+      // 跨河小木橋
+      bridge = new THREE.Group();
+      for (let i = -4; i <= 4; i++) {
+        const plank = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 4), voxelMat.wood);
+        plank.position.set(i * 0.9, 0.2, 0);
+        plank.castShadow = true;
+        bridge.add(plank);
+      }
+      scene.add(bridge);
+
+      // 方塊樹木群 (Tree Factory)
+      function createVoxelTree(x, z) {
+        const tree = new THREE.Group();
+        const trunk = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 1.2), voxelMat.wood);
+        trunk.position.y = 2;
+        trunk.castShadow = true;
+        tree.add(trunk);
+
+        const leaf1 = new THREE.Mesh(new THREE.BoxGeometry(4, 2.5, 4), voxelMat.leaves);
+        leaf1.position.y = 4.5;
+        leaf1.castShadow = true;
+        tree.add(leaf1);
+
+        const leaf2 = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2, 2.5), voxelMat.leaves);
+        leaf2.position.y = 6.2;
+        leaf2.castShadow = true;
+        tree.add(leaf2);
+
+        tree.position.set(x, 0, z);
+        scene.add(tree);
+      }
+
+      createVoxelTree(-12, -10);
+      createVoxelTree(-15, 6);
+      createVoxelTree(-8, 14);
+      createVoxelTree(12, -14);
+      createVoxelTree(16, 12);
+
+      // 體素小屋 (含破損屋頂待修理)
+      houseGroup = new THREE.Group();
+      houseGroup.position.set(13, 0, 0);
+
+      // 牆壁基底
+      const walls = new THREE.Mesh(new THREE.BoxGeometry(7, 4.5, 6), voxelMat.wall);
+      walls.position.y = 2.25;
+      walls.castShadow = true;
+      walls.receiveShadow = true;
+      houseGroup.add(walls);
+
+      // 門與窗戶裝飾
+      const door = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 1.6), voxelMat.wood);
+      door.position.set(-3.51, 1.25, 0);
+      houseGroup.add(door);
+
+      // 屋頂固定部分
+      const mainRoof = new THREE.Mesh(new THREE.BoxGeometry(7.6, 1.5, 4), voxelMat.roof);
+      mainRoof.position.set(0, 5, -1);
+      mainRoof.castShadow = true;
+      houseGroup.add(mainRoof);
+
+      // 屋頂損壞方塊 (第三關修復對象)
+      for (let i = -1; i <= 1; i++) {
+        const roofBlock = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.2, 2), voxelMat.roof);
+        roofBlock.position.set(i * 2.3, 5, 1.5);
+        roofBlock.castShadow = true;
+        roofBlock.visible = false; // 初始損壞未建造
+        houseGroup.add(roofBlock);
+        brokenRoofBlocks.push(roofBlock);
+      }
+      scene.add(houseGroup);
+
+      // 點綴草地野花與蝴蝶
+      for (let i = 0; i < 24; i++) {
+        const flower = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.6, 0.35), 
+          Math.random() > 0.5 ? voxelMat.flowerRed : voxelMat.flowerYellow);
+        const fx = (Math.random() - 0.5) * 36;
+        const fz = (Math.random() - 0.5) * 36;
+        if (Math.abs(fx) > 4) {
+          flower.position.set(fx, 0.3, fz);
+          scene.add(flower);
+        }
+      }
+
+      // 飛舞的黃色體素蝴蝶
+      for (let b = 0; b < 4; b++) {
+        const bfly = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.4), voxelMat.flowerYellow);
+        bfly.position.set(-5 + b * 3, 2 + Math.random(), -5 + b * 2);
+        butterflies.push({ mesh: bfly, seed: Math.random() * 10 });
+        scene.add(bfly);
+      }
+    }
+
+    // 建立玩家角色 (體素小勇者 Tingting)
+    function createPlayer() {
+      player = new THREE.Group();
+
+      const skinMat = new THREE.MeshLambertMaterial({ color: 0xffd54f });
+      const shirtMat = new THREE.MeshLambertMaterial({ color: 0x1976d2 });
+      const pantsMat = new THREE.MeshLambertMaterial({ color: 0x37474f });
+
+      // 頭部
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.9), skinMat);
+      head.position.y = 1.6;
+      head.castShadow = true;
+      player.add(head);
+
+      // 身體
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.0, 0.6), shirtMat);
+      body.position.y = 0.85;
+      body.castShadow = true;
+      player.add(body);
+
+      // 四肢
+      player.leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.8, 0.4), pantsMat);
+      player.leftLeg.position.set(-0.25, 0.4, 0);
+      player.add(player.leftLeg);
+
+      player.rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.8, 0.4), pantsMat);
+      player.rightLeg.position.set(0.25, 0.4, 0);
+      player.add(player.rightLeg);
+
+      player.position.set(-10, 0, 4);
+      scene.add(player);
+    }
+
+    // 建立嚮導小熊 NPC (Guide Bear)
+    function createBearNPC() {
+      bearNpc = new THREE.Group();
+      const bearMat = new THREE.MeshLambertMaterial({ color: 0x8d5b4c });
+      const muzzleMat = new THREE.MeshLambertMaterial({ color: 0xd7ccc8 });
+
+      // 熊身體
+      const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.8, 1.4), bearMat);
+      body.position.y = 1.1;
+      body.castShadow = true;
+      bearNpc.add(body);
+
+      // 熊頭
+      const head = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.3, 1.3), bearMat);
+      head.position.y = 2.4;
+      head.castShadow = true;
+      bearNpc.add(head);
+
+      // 嘴鼻
+      const muzzle = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.4), muzzleMat);
+      muzzle.position.set(0, 2.25, 0.7);
+      bearNpc.add(muzzle);
+
+      // 耳朵
+      const earL = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.2), bearMat);
+      earL.position.set(-0.6, 3.1, 0.1);
+      bearNpc.add(earL);
+
+      const earR = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.2), bearMat);
+      earR.position.set(0.6, 3.1, 0.1);
+      bearNpc.add(earR);
+
+      // 右手臂 (揮手動作)
+      bearNpc.rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.1, 0.45), bearMat);
+      bearNpc.rightArm.position.set(0.95, 1.4, 0);
+      bearNpc.add(bearNpc.rightArm);
+
+      // 頭頂懸浮金色驚嘆號 "!"
+      const markGeo = new THREE.BoxGeometry(0.3, 0.8, 0.3);
+      const markMat = new THREE.MeshBasicMaterial({ color: 0xffd600 });
+      bearNpc.questMark = new THREE.Mesh(markGeo, markMat);
+      bearNpc.questMark.position.y = 3.8;
+      bearNpc.add(bearNpc.questMark);
+
+      bearNpc.position.set(-4, 0, 0);
+      bearNpc.rotation.y = Math.PI / 4;
+      scene.add(bearNpc);
+    }
+
+    // 建立可採集的體素蘋果 (第二關)
+    function createCollectibles() {
+      const appleMat = new THREE.MeshLambertMaterial({ color: 0xf44336 });
+      const stemMat = new THREE.MeshLambertMaterial({ color: 0x4caf50 });
+
+      const positions = [
+        { x: -11, z: -8 },
+        { x: -7, z: 12 },
+        { x: -14, z: 4 }
+      ];
+
+      positions.forEach((pos, idx) => {
+        const apple = new THREE.Group();
+        const fruit = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), appleMat);
+        fruit.position.y = 0.5;
+        fruit.castShadow = true;
+        apple.add(fruit);
+
+        const stem = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.3, 0.15), stemMat);
+        stem.position.y = 0.95;
+        apple.add(stem);
+
+        apple.position.set(pos.x, 0, pos.z);
+        apple.visible = false; // 第二關才現身
+        apple.id = idx + 1;
+        appleObjects.push(apple);
+        scene.add(apple);
+      });
+    }
+
+    /* ==========================================================================
+       5. 鍵盤與手機虛擬搖桿操控 (Controls)
+       ========================================================================== */
+    function setupControls() {
+      // 鍵盤監聽
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') moveState.forward = 1;
+        if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') moveState.forward = -1;
+        if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') moveState.right = -1;
+        if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') moveState.right = 1;
+        if (e.key === ' ' && isGrounded) {
+          playerVelocityY = 9.5;
+          isGrounded = false;
+          Sound.playPop();
+        }
+        if (e.key === 'e' || e.key === 'E') {
+          triggerAction();
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (['w', 'W', 'ArrowUp', 's', 'S', 'ArrowDown'].includes(e.key)) moveState.forward = 0;
+        if (['a', 'A', 'ArrowLeft', 'd', 'D', 'ArrowRight'].includes(e.key)) moveState.right = 0;
+      });
+
+      // 手機跳躍與互動按鈕
+      document.getElementById('jump-btn').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (isGrounded) {
+          playerVelocityY = 9.5;
+          isGrounded = false;
+          Sound.playPop();
+        }
+      });
+      document.getElementById('action-btn').addEventListener('click', () => {
+        triggerAction();
+      });
+
+      // 虛擬動態搖桿
+      const joyZone = document.getElementById('joystick-zone');
+      const joyKnob = document.getElementById('joystick-knob');
+      let touchId = null;
+      let startX = 0, startY = 0;
+
+      joyZone.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.changedTouches[0];
+        touchId = touch.identifier;
+        const rect = joyZone.getBoundingClientRect();
+        startX = rect.left + rect.width / 2;
+        startY = rect.top + rect.height / 2;
+      });
+
+      window.addEventListener('touchmove', (e) => {
+        if (touchId === null) return;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === touchId) {
+            const touch = e.changedTouches[i];
+            const dx = touch.clientX - startX;
+            const dy = touch.clientY - startY;
+            const dist = Math.min(45, Math.hypot(dx, dy));
+            const angle = Math.atan2(dy, dx);
+
+            joyKnob.style.transform = `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist}px))`;
+
+            moveState.right = (Math.cos(angle) * dist) / 45;
+            moveState.forward = -(Math.sin(angle) * dist) / 45;
+          }
+        }
+      }, { passive: false });
+
+      const resetJoy = () => {
+        touchId = null;
+        joyKnob.style.transform = 'translate(-50%, -50%)';
+        moveState.forward = 0;
+        moveState.right = 0;
+      };
+      window.addEventListener('touchend', resetJoy);
+      window.addEventListener('touchcancel', resetJoy);
+    }
+
+    /* ==========================================================================
+       6. 闖關流程與教學互動邏輯 (Stage 1 -> 2 -> 3 -> Victory)
+       ========================================================================== */
+    const UI = {
+      missionDesc: document.getElementById('mission-desc'),
+      prompt: document.getElementById('interact-prompt'),
+      dialogModal: document.getElementById('dialog-modal'),
+      bubbleEn: document.getElementById('bubble-en'),
+      bubbleZh: document.getElementById('bubble-zh'),
+      bubblePhonics: document.getElementById('bubble-phonics'),
+      phonicsBox: document.getElementById('phonics-box'),
+      optionsContainer: document.getElementById('options-container'),
+      victoryModal: document.getElementById('victory-modal')
+    };
+
+    function updateMissionUI() {
+      if (GAME.stage === 1) {
+        UI.missionDesc.innerText = "走到小熊身旁並對話 (Talk to Bear)";
+      } else if (GAME.stage === 2) {
+        UI.missionDesc.innerText = `採集紅色蘋果 (${GAME.applesCollected}/${GAME.totalApples} Apples)`;
+      } else if (GAME.stage === 3) {
+        UI.missionDesc.innerText = "走到木屋旁修補屋頂 (Fix the Roof)";
+      }
+    }
+
+    function checkProximity() {
+      const distToBear = player.position.distanceTo(bearNpc.position);
+      const distToHouse = player.position.distanceTo(new THREE.Vector3(10, 0, 1.5));
+
+      if (GAME.stage === 1 && distToBear < 3.2) {
+        UI.prompt.style.display = 'block';
+        UI.prompt.innerText = "💬 按 E 或點綠色按鈕跟小熊對話";
+        return;
+      }
+      if (GAME.stage === 2 && GAME.applesCollected >= GAME.totalApples && distToBear < 3.2) {
+        UI.prompt.style.display = 'block';
+        UI.prompt.innerText = "💬 按 E 向小熊回報任務";
+        return;
+      }
+      if (GAME.stage === 3 && distToHouse < 3.5) {
+        UI.prompt.style.display = 'block';
+        UI.prompt.innerText = "🔨 按 E 修復屋頂 (Fix the House)";
+        return;
+      }
+      UI.prompt.style.display = 'none';
+    }
+
+    function triggerAction() {
+      const distToBear = player.position.distanceTo(bearNpc.position);
+      const distToHouse = player.position.distanceTo(new THREE.Vector3(10, 0, 1.5));
+
+      // 第一關：與小熊見面
+      if (GAME.stage === 1 && distToBear < 3.2) {
+        openStage1Dialog();
+        return;
+      }
+
+      // 第二關收集完，回去找小熊
+      if (GAME.stage === 2 && GAME.applesCollected >= GAME.totalApples && distToBear < 3.2) {
+        openStage2CompletedDialog();
+        return;
+      }
+
+      // 第三關：走到屋頂破損處修復
+      if (GAME.stage === 3 && distToHouse < 3.5) {
+        openStage3Quiz();
+        return;
+      }
+    }
+
+    // 第一關對話框 (區分 3-6歲 vs 7-12歲)
+    function openStage1Dialog() {
+      Sound.playPop();
+      UI.dialogModal.style.display = 'flex';
+      UI.phonicsBox.style.display = 'none';
+
+      if (GAME.mode === 'kids') {
+        // 幼兒組：簡短大字，著重問候與重複聆聽
+        UI.bubbleEn.innerText = "Hello! I am Bear. Let's be friends!";
+        UI.bubbleZh.innerText = "你好！我是小熊，我們當好朋友吧！";
+        Speech.speak("Hello! I am Bear. Let's be friends!");
+
+        UI.optionsContainer.innerHTML = `
+          <button class="btn-choice" onclick="handleChoice('kids-hello')">
+            <span>👋 Hello! (打招呼)</span> <span>🔊</span>
+          </button>
+        `;
+      } else {
+        // 學齡組：生活句型選擇與代換
+        UI.bubbleEn.innerText = "Hello! What is your name, brave explorer?";
+        UI.bubbleZh.innerText = "你好！勇敢的探險家，你叫什麼名字呢？";
+        Speech.speak("Hello! What is your name, brave explorer?");
+
+        UI.optionsContainer.innerHTML = `
+          <button class="btn-choice" onclick="handleChoice('school-name-1')">
+            <span>A: My name is Tingting.</span> <span>🔊</span>
+          </button>
+          <button class="btn-choice" onclick="handleChoice('school-name-2')">
+            <span>B: I am a brave hero!</span> <span>🔊</span>
+          </button>
+        `;
+      }
+    }
+
+    function handleChoice(type) {
+      Sound.playPop();
+      if (type === 'kids-hello' || type === 'school-name-1' || type === 'school-name-2') {
+        const reply = type === 'kids-hello' ? "Hello friend!" : "Nice to meet you!";
+        Speech.speak(reply);
+        
+        UI.bubbleEn.innerText = "Great! We need food. Can you find 3 Apples?";
+        UI.bubbleZh.innerText = "太棒了！我們需要食物，你能幫我找到 3 顆紅蘋果嗎？";
+        Speech.speak("Great! We need food. Can you find 3 Apples?");
+
+        UI.optionsContainer.innerHTML = `
+          <button class="btn-choice" onclick="startStage2()">
+            <span>🍎 沒問題！出發找蘋果 (Let's Go!)</span>
+          </button>
+        `;
+      }
+    }
+
+    function startStage2() {
+      UI.dialogModal.style.display = 'none';
+      GAME.stage = 2;
+      updateMissionUI();
+      // 顯示散落的蘋果
+      appleObjects.forEach(apple => apple.visible = true);
+      Sound.playChime();
+    }
+
+    // 碰觸採集蘋果
+    function checkAppleCollision() {
+      if (GAME.stage !== 2) return;
+      appleObjects.forEach(apple => {
+        if (apple.visible && player.position.distanceTo(apple.position) < 1.4) {
+          apple.visible = false;
+          GAME.applesCollected++;
+          Sound.playChime();
+
+          // 彈出單字卡片並進行 Phonics 發音拼讀
+          showAppleWordCard();
+          updateMissionUI();
+        }
+      });
+    }
+
+    function showAppleWordCard() {
+      UI.dialogModal.style.display = 'flex';
+      UI.phonicsBox.style.display = 'block';
+
+      UI.bubbleEn.innerText = "Apple!";
+      UI.bubbleZh.innerText = `蘋果（已收集 ${GAME.applesCollected} / 3）`;
+      UI.bubblePhonics.innerText = "A - P - P - L - E";
+
+      Speech.spellOut("Apple");
+
+      UI.optionsContainer.innerHTML = `
+        <button class="btn-choice" onclick="UI.dialogModal.style.display='none'">
+          <span>✅ 記住單字了！繼續尋找 (Continue)</span>
+        </button>
+      `;
+    }
+
+    function openStage2CompletedDialog() {
+      UI.dialogModal.style.display = 'flex';
+      UI.phonicsBox.style.display = 'none';
+
+      UI.bubbleEn.innerText = "Yummy! Thank you! Now our roof is broken. Can you help me fix the house?";
+      UI.bubbleZh.innerText = "太好吃了謝謝你！現在木屋的屋頂破了，你能幫我修補房子嗎？";
+      Speech.speak("Yummy! Thank you! Now can you help me fix the house?");
+
+      UI.optionsContainer.innerHTML = `
+        <button class="btn-choice" onclick="startStage3()">
+          <span>🔨 幫小熊修房子 (Help Fix House)</span>
+        </button>
+      `;
+    }
+
+    function startStage3() {
+      UI.dialogModal.style.display = 'none';
+      GAME.stage = 3;
+      updateMissionUI();
+      Sound.playPop();
+    }
+
+    // 第三關挑戰：屋頂修復知識問答
+    function openStage3Quiz() {
+      UI.dialogModal.style.display = 'flex';
+      UI.phonicsBox.style.display = 'none';
+
+      if (GAME.mode === 'kids') {
+        // 幼兒組：顏色與名詞圖像選擇
+        UI.bubbleEn.innerText = "What do we need to fix the roof?";
+        UI.bubbleZh.innerText = "我們要用什麼材料修補屋頂呢？";
+        Speech.speak("What do we need to fix the roof?");
+
+        UI.optionsContainer.innerHTML = `
+          <button class="btn-choice" onclick="finishBuild()">
+            <span>🪵 Wood (棕色木頭)</span> <span>🔊</span>
+          </button>
+          <button class="btn-choice" onclick="wrongChoice()">
+            <span>💧 Water (藍色水)</span> <span>🔊</span>
+          </button>
+        `;
+      } else {
+        // 學齡組：文法拼字挑戰
+        UI.bubbleEn.innerText = "Complete the sentence: 'We need ____ to build the roof.'";
+        UI.bubbleZh.innerText = "完成句子：我們需要____來建造屋頂。";
+        Speech.speak("Complete the sentence: We need what to build the roof?");
+
+        UI.optionsContainer.innerHTML = `
+          <button class="btn-choice" onclick="finishBuild()">
+            <span>A: Wood (木材)</span> <span>🔊</span>
+          </button>
+          <button class="btn-choice" onclick="wrongChoice()">
+            <span>B: Cloud (雲朵)</span> <span>🔊</span>
+          </button>
+        `;
+      }
+    }
+
+    function wrongChoice() {
+      Speech.speak("Try again! Listen carefully!");
+      Sound.playPop();
+    }
+
+    function finishBuild() {
+      Sound.playFanfare();
+      Speech.speak("Correct! We need wood! You fixed the house!");
+
+      // 修補屋頂動畫現身
+      brokenRoofBlocks.forEach(b => b.visible = true);
+      UI.dialogModal.style.display = 'none';
+
+      // 施放慶祝勝利煙火
+      setTimeout(showVictory, 800);
+    }
+
+    function showVictory() {
+      UI.victoryModal.style.display = 'flex';
+      Sound.playFanfare();
+      Speech.speak("Congratulations! Stage Clear! You are a superstar!");
+
+      const list = document.getElementById('summary-word-list');
+      list.innerHTML = GAME.learnedWords.map(w => `
+        <div class="word-summary-item" onclick="Speech.speak('${w.en}')">
+          <span>${w.en} (${w.zh})</span>
+          <span>🔊</span>
+        </div>
+      `).join('');
+    }
+
+    /* ==========================================================================
+       7. 模式切換與全域按鈕綁定
+       ========================================================================== */
+    document.getElementById('mode-kids').addEventListener('click', () => {
+      setMode('kids');
+    });
+    document.getElementById('mode-school').addEventListener('click', () => {
+      setMode('school');
+    });
+    document.getElementById('btn-toggle-mode').addEventListener('click', () => {
+      document.getElementById('mode-modal').style.display = 'flex';
+    });
+
+    function setMode(mode) {
+      GAME.mode = mode;
+      document.getElementById('mode-modal').style.display = 'none';
+      const tag = document.getElementById('current-mode-tag');
+      if (mode === 'kids') {
+        tag.innerText = "🐣 幼兒組 (3-6歲)";
+        tag.style.background = "#4caf50";
+      } else {
+        tag.innerText = "🚀 學齡組 (7-12歲)";
+        tag.style.background = "#1976d2";
+      }
+      Sound.playPop();
+    }
+
+    document.getElementById('btn-replay-audio').addEventListener('click', () => {
+      Speech.speak(UI.missionDesc.innerText);
+    });
+    document.getElementById('speak-dialog-btn').addEventListener('click', () => {
+      Speech.speak(UI.bubbleEn.innerText);
+    });
+    document.getElementById('btn-replay-game').addEventListener('click', () => {
+      location.reload();
+    });
+
+    /* ==========================================================================
+       8. 主迴圈渲染與動畫 (Render Loop)
+       ========================================================================== */
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+
+      // 玩家跳躍與重力運算
+      player.position.y += playerVelocityY * delta;
+      if (player.position.y > 0) {
+        playerVelocityY -= gravity * delta;
+      } else {
+        player.position.y = 0;
+        playerVelocityY = 0;
+        isGrounded = true;
+      }
+
+      // 玩家平滑移動與方向朝向
+      if (moveState.forward !== 0 || moveState.right !== 0) {
+        const moveVec = new THREE.Vector3(moveState.right, 0, -moveState.forward).normalize();
+        player.position.x += moveVec.x * playerSpeed * delta;
+        player.position.z += moveVec.z * playerSpeed * delta;
+
+        // 角色轉身面朝移動方向
+        const targetRot = Math.atan2(moveVec.x, moveVec.z);
+        player.rotation.y = targetRot;
+
+        // 奔跑雙腳交替動畫
+        player.leftLeg.rotation.x = Math.sin(time * 12) * 0.6;
+        player.rightLeg.rotation.x = -Math.sin(time * 12) * 0.6;
+      } else {
+        player.leftLeg.rotation.x = 0;
+        player.rightLeg.rotation.x = 0;
+      }
+
+      // 第三人稱攝像機平滑跟隨 (Third-Person Follow Cam)
+      const camTargetPos = new THREE.Vector3(
+        player.position.x,
+        player.position.y + 6.5,
+        player.position.z + 10
+      );
+      camera.position.lerp(camTargetPos, 0.08);
+      camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
+
+      // NPC 揮手與驚嘆號旋轉
+      if (bearNpc) {
+        bearNpc.questMark.rotation.y += delta * 2;
+        bearNpc.questMark.position.y = 3.8 + Math.sin(time * 3) * 0.15;
+        bearNpc.rightArm.rotation.x = Math.sin(time * 6) * 0.4;
+      }
+
+      // 蘋果旋轉與上下漂浮
+      appleObjects.forEach((apple, i) => {
+        if (apple.visible) {
+          apple.rotation.y += delta * 1.5;
+          apple.position.y = Math.sin(time * 3 + i) * 0.2;
+        }
+      });
+
+      // 蝴蝶翩翩起舞
+      butterflies.forEach(b => {
+        b.mesh.position.y += Math.sin(time * 4 + b.seed) * 0.02;
+        b.mesh.rotation.y += 0.02;
+      });
+
+      // 碰撞與距離偵測
+      checkProximity();
+      checkAppleCollision();
+
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // 啟動 3D 場景
+    window.addEventListener('load', init3D);
+  </script>
+</body>
+</html>
