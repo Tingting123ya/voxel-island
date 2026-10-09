@@ -1,79 +1,1051 @@
-// 瀏覽器語音辨識模組 (支援 Chrome / Edge / Android / Safari)
-const SpeechRec = {
-  recognition: null,
-  isListening: false,
-  
-  init() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.warn("此瀏覽器不支援語音辨識，將切換為按鈕模式");
-      return false;
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Voxel English World - 10 關語音冒險島</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
     }
-    this.recognition = new SpeechRecognition();
-    this.recognition.lang = 'en-US'; // 英文辨識
-    this.recognition.continuous = false;
-    this.recognition.interimResults = false;
-    return true;
-  },
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #87ceeb;
+      font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+    }
+    #canvas3d {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
-  listen(targetWord, onSuccess, onFail) {
-    if (!this.recognition && !this.init()) return;
-    
-    this.recognition.onstart = () => {
-      this.isListening = true;
-      document.getElementById('mic-indicator').innerText = "🎙️ 正在聆聽中... 請念出單字！";
-    };
+    /* 頂部 HUD */
+    #top-hud {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 10;
+    }
 
-    this.recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript.trim().toLowerCase();
-      const target = targetWord.toLowerCase();
+    .badge-card {
+      background: rgba(255, 255, 255, 0.94);
+      border: 4px solid #4a3728;
+      border-radius: 20px;
+      padding: 8px 16px;
+      box-shadow: 0 6px 0 #2e2118, 0 10px 16px rgba(0,0,0,0.2);
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .player-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .player-avatar {
+      width: 42px;
+      height: 42px;
+      background: #ffcc00;
+      border: 3px solid #4a3728;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .player-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #3e2723;
+    }
+    .stage-badge {
+      font-size: 12px;
+      background: #ff9800;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-weight: 700;
+      width: fit-content;
+    }
+
+    .mission-card {
+      max-width: 380px;
+    }
+    .mission-title {
+      font-size: 12px;
+      color: #ff8f00;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .mission-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e2118;
+    }
+
+    /* 互動提示標籤 */
+    #interact-prompt {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffeb3b;
+      border: 4px solid #4a3728;
+      border-radius: 50px;
+      padding: 10px 24px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #3e2723;
+      box-shadow: 0 6px 0 #4a3728;
+      display: none;
+      z-index: 15;
+      animation: pulse 0.8s infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: translateX(-50%) scale(1); }
+      to { transform: translateX(-50%) scale(1.06); }
+    }
+
+    /* 手機虛擬控制項 */
+    #mobile-controls {
+      position: absolute;
+      bottom: 24px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 20;
+    }
+    #joystick-zone {
+      width: 120px;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.45);
+      border: 4px solid rgba(74, 55, 40, 0.6);
+      border-radius: 50%;
+      position: relative;
+      touch-action: none;
+      pointer-events: auto;
+    }
+    #joystick-knob {
+      width: 52px;
+      height: 52px;
+      background: #ffcc00;
+      border: 3px solid #4a3728;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 0 #4a3728;
+    }
+    .action-group {
+      display: flex;
+      gap: 16px;
+    }
+    .touch-btn {
+      pointer-events: auto;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      border: 4px solid #4a3728;
+      box-shadow: 0 6px 0 #4a3728;
+      cursor: pointer;
+    }
+    .touch-btn:active {
+      transform: translateY(6px);
+      box-shadow: 0 0 0 #4a3728;
+    }
+    #jump-btn {
+      width: 66px;
+      height: 66px;
+      background: #42a5f5;
+      color: white;
+      font-size: 24px;
+    }
+    #action-btn {
+      width: 76px;
+      height: 76px;
+      background: #66bb6a;
+      color: white;
+      font-size: 28px;
+    }
+
+    /* 對話與語音發音視窗 */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .modal-box {
+      background: #fffdf5;
+      border: 6px solid #4a3728;
+      border-radius: 28px;
+      width: 100%;
+      max-width: 520px;
+      padding: 22px;
+      box-shadow: 0 12px 0 #2e2118, 0 20px 40px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      animation: popIn 0.22s ease-out;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .modal-avatar {
+      font-size: 38px;
+      background: #ffe082;
+      border: 3px solid #4a3728;
+      border-radius: 16px;
+      padding: 4px;
+    }
+    .speech-bubble {
+      background: #e8f5e9;
+      border: 3px dashed #4caf50;
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .english-text {
+      font-size: 21px;
+      font-weight: 700;
+      color: #1b5e20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chinese-text {
+      font-size: 15px;
+      color: #43a047;
+      margin-top: 5px;
+      font-weight: 600;
+    }
+    .phonics-spell {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #e65100;
+      background: #ffe0b2;
+      padding: 6px 14px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    /* 語音麥克風互動按鈕區 */
+    .mic-control-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      background: #fff3e0;
+      border: 3px solid #ffb74d;
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .mic-button {
+      background: #ff5722;
+      color: white;
+      border: 4px solid #bf360c;
+      border-radius: 50px;
+      padding: 12px 30px;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 0 #bf360c;
+      transition: all 0.15s;
+    }
+    .mic-button.listening {
+      background: #e91e63;
+      border-color: #880e4f;
+      box-shadow: 0 0 15px #e91e63;
+      animation: listeningAnim 1s infinite alternate;
+    }
+    @keyframes listeningAnim {
+      from { transform: scale(1); }
+      to { transform: scale(1.05); }
+    }
+    .mic-indicator-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: #d84315;
+    }
+
+    .btn-choice {
+      background: #ffecb3;
+      border: 4px solid #4a3728;
+      border-radius: 18px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #3e2723;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 0 #4a3728;
+    }
+    .btn-choice:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #4a3728;
+    }
+    .speaker-btn {
+      background: white;
+      border: 2px solid #4caf50;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .summary-item {
+      background: #e8eaf6;
+      border: 2px solid #3f51b5;
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a237e;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <canvas id="canvas3d"></canvas>
+
+  <!-- 頂部 HUD -->
+  <div id="top-hud">
+    <div class="badge-card player-profile">
+      <div class="player-avatar">⭐</div>
+      <div>
+        <div class="player-name">Tingting123ya</div>
+        <div id="stage-badge-text" class="stage-badge">Stage 1 / 10</div>
+      </div>
+    </div>
+
+    <div class="badge-card mission-card">
+      <div class="mission-title">🎯 當前任務目標</div>
+      <div id="mission-desc" class="mission-text">走到小熊旁邊按對話 (Talk to Bear)</div>
+    </div>
+  </div>
+
+  <!-- 接近互動提示 -->
+  <div id="interact-prompt">💬 按 E 或點綠色按鈕開始互動</div>
+
+  <!-- 手機控制介面 -->
+  <div id="mobile-controls">
+    <div id="joystick-zone">
+      <div id="joystick-knob"></div>
+    </div>
+    <div class="action-group">
+      <div class="touch-btn" id="jump-btn">🦘</div>
+      <div class="touch-btn" id="action-btn">💬</div>
+    </div>
+  </div>
+
+  <!-- 核心對話與發音練習視窗 -->
+  <div class="modal-overlay" id="dialog-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-avatar" id="modal-avatar">🐻</div>
+        <div>
+          <h3 id="modal-speaker">Guide Bear</h3>
+          <p id="modal-role">English Adventure Island</p>
+        </div>
+      </div>
+
+      <div class="speech-bubble">
+        <div class="english-text">
+          <span id="modal-en">Hello! What is your name?</span>
+          <button class="speaker-btn" id="btn-replay-speech">🔊</button>
+        </div>
+        <div class="chinese-text" id="modal-zh">你好！你叫什麼名字呢？</div>
+        <div class="phonics-spell" id="modal-phonics">H - E - L - L - O</div>
+      </div>
+
+      <!-- 語音練習互動區 -->
+      <div class="mic-control-area">
+        <div class="mic-indicator-text" id="mic-indicator">👇 按下麥克風，對著手機大聲念出單字！</div>
+        <button class="mic-button" id="btn-mic-record">
+          <span>🎙️</span> <span id="mic-btn-text">點擊練習發音 (Speak)</span>
+        </button>
+      </div>
+
+      <!-- 備用按鈕（聽音跟讀通關） -->
+      <button class="btn-choice" id="btn-fallback-pass">
+        <span id="fallback-pass-text">🎧 聽音跟讀過關 (Listen & Repeat)</span>
+        <span>✅</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 10 關通關結算 -->
+  <div class="modal-overlay" id="victory-modal" style="display: none;">
+    <div class="modal-box" style="text-align: center;">
+      <div style="font-size: 60px;">🏆🎉</div>
+      <h2 style="font-size: 26px; color: #2e7d32;">Congratulations! 冒險大滿貫！</h2>
+      <p style="font-size: 15px; color: #666;">Tingting123ya 成功通過了全部 10 個英語發音關卡！</p>
       
-      // 容錯機制：包含目標單字即算通過
-      if (transcript.includes(target)) {
-        onSuccess(transcript);
-      } else {
-        onFail(transcript);
+      <div style="text-align: left; margin: 10px 0;">
+        <h4 style="color: #4a3728; margin-bottom: 6px;">📖 10 關核心單字榮譽庫：</h4>
+        <div class="summary-grid" id="summary-word-list"></div>
+      </div>
+
+      <button class="btn-choice" onclick="location.reload()" style="justify-content: center; background: #81c784;">
+        🔄 重新挑戰 (Play Again)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. 完整 10 大關卡資料庫 (QUEST_LIST)
+       ========================================================================== */
+    const QUEST_LIST = [
+      {
+        id: 1,
+        title: "Stage 1: Hello Guide Bear",
+        targetWord: "Hello",
+        sentence: "Hello! What is your name?",
+        chinese: "你好！你叫什麼名字？",
+        phonics: "H - E - L - L - O",
+        npcAvatar: "🐻",
+        speaker: "Guide Bear",
+        instruction: "走向小熊，念出 Hello！"
+      },
+      {
+        id: 2,
+        title: "Stage 2: Fresh Apples",
+        targetWord: "Apple",
+        sentence: "I want a sweet red Apple!",
+        chinese: "我想要一顆香甜的紅蘋果！",
+        phonics: "A - P - P - L - E",
+        npcAvatar: "🍎",
+        speaker: "Fruit Tree",
+        instruction: "走向果樹旁，念出 Apple！"
+      },
+      {
+        id: 3,
+        title: "Stage 3: Color Meadow",
+        targetWord: "Yellow",
+        sentence: "The sheep likes Yellow flowers.",
+        chinese: "小羊喜歡黃色的花朵。",
+        phonics: "Y - E - L - L - O - W",
+        npcAvatar: "🐑",
+        speaker: "Fluffy Sheep",
+        instruction: "走到小羊旁，念出 Yellow！"
+      },
+      {
+        id: 4,
+        title: "Stage 4: Animal Farm",
+        targetWord: "Rabbit",
+        sentence: "Hop, hop! Look at the white Rabbit!",
+        chinese: "蹦蹦跳！看那隻可愛的小白兔！",
+        phonics: "R - A - B - B - I - T",
+        npcAvatar: "🐰",
+        speaker: "Bunny Friend",
+        instruction: "靠近草地上的小兔子，念出 Rabbit！"
+      },
+      {
+        id: 5,
+        title: "Stage 5: Number Bridge",
+        targetWord: "Three",
+        sentence: "We need Three stones to cross the river.",
+        chinese: "我們需要 3 塊石頭才能過河。",
+        phonics: "T - H - R - E - E",
+        npcAvatar: "🌉",
+        speaker: "Bridge Spirit",
+        instruction: "走到木橋中央，念出 Three！"
+      },
+      {
+        id: 6,
+        title: "Stage 6: Snack Bakery",
+        targetWord: "Milk",
+        sentence: "May I have some Milk, please?",
+        chinese: "請給我一杯牛奶好嗎？",
+        phonics: "M - I - L - K",
+        npcAvatar: "🥛",
+        speaker: "Bakery Chef",
+        instruction: "走到點心桌旁，念出 Milk！"
+      },
+      {
+        id: 7,
+        title: "Stage 7: Builder House",
+        targetWord: "Wood",
+        sentence: "We need strong Wood for the house.",
+        chinese: "修復木屋需要堅固的木頭。",
+        phonics: "W - O - O - D",
+        npcAvatar: "🪵",
+        speaker: "Builder Beaver",
+        instruction: "走到小屋牆角，念出 Wood！"
+      },
+      {
+        id: 8,
+        title: "Stage 8: Weather Hill",
+        targetWord: "Sunny",
+        sentence: "The sky is bright and Sunny!",
+        chinese: "今天天空很明亮，是個大晴天！",
+        phonics: "S - U - N - N - Y",
+        npcAvatar: "☀️",
+        speaker: "Sun Spirit",
+        instruction: "走到山丘高處，念出 Sunny！"
+      },
+      {
+        id: 9,
+        title: "Stage 9: Maze Action",
+        targetWord: "Jump",
+        sentence: "Ready, set, Jump over the grass!",
+        chinese: "預備，跳躍越過草地！",
+        phonics: "J - U - M - P",
+        npcAvatar: "🦘",
+        speaker: "Kangaroo Coach",
+        instruction: "走到迷宮入口，念出 Jump！"
+      },
+      {
+        id: 10,
+        title: "Stage 10: Grand Finale",
+        targetWord: "Star",
+        sentence: "You did it! You are a superstar!",
+        chinese: "你做到了！你是一顆閃亮的大明星！",
+        phonics: "S - T - A - R",
+        npcAvatar: "⭐",
+        speaker: "Island Queen",
+        instruction: "回到噴泉中央，念出 Star 領取證書！"
+      }
+    ];
+
+    let currentStageIndex = 0;
+
+    /* ==========================================================================
+       2. Web Audio 合成音效
+       ========================================================================== */
+    const Sound = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+      },
+      playPop() {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.frequency.setValueAtTime(350, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(750, this.ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.1);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.1);
+      },
+      playSuccess() {
+        this.init();
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.08);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.08 + 0.4);
+          osc.start(this.ctx.currentTime + i * 0.08);
+          osc.stop(this.ctx.currentTime + i * 0.08 + 0.4);
+        });
       }
     };
 
-    this.recognition.onerror = () => {
-      this.isListening = false;
-      onFail("辨識失敗");
+    /* ==========================================================================
+       3. 語音朗讀 (Speech Synthesis) & 辨識 (Speech Recognition)
+       ========================================================================== */
+    const Voice = {
+      synth: window.speechSynthesis,
+      speak(text, rate = 0.85) {
+        if (!this.synth) return;
+        this.synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = rate;
+        utter.pitch = 1.1;
+        this.synth.speak(utter);
+      }
     };
 
-    this.recognition.onend = () => {
-      this.isListening = false;
+    const SpeechRec = {
+      recognition: null,
+      isListening: false,
+      init() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          console.warn("此瀏覽器不支援 Web Speech API 辨識");
+          return false;
+        }
+        this.recognition = new SpeechRecognition();
+        this.recognition.lang = 'en-US';
+        this.recognition.continuous = false;
+        this.recognition.interimResults = false;
+        return true;
+      },
+      listen(targetWord, onSuccess, onFail) {
+        if (!this.recognition && !this.init()) {
+          onFail("瀏覽器未授權或未支援語音，請使用跟讀按鈕！");
+          return;
+        }
+        const micBtn = document.getElementById('btn-mic-record');
+        const indicator = document.getElementById('mic-indicator');
+
+        this.recognition.onstart = () => {
+          this.isListening = true;
+          micBtn.classList.add('listening');
+          indicator.innerText = `🎙️ 聆聽中... 請念出：「${targetWord}」！`;
+        };
+
+        this.recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript.trim().toLowerCase();
+          const target = targetWord.toLowerCase();
+          if (transcript.includes(target)) {
+            onSuccess(transcript);
+          } else {
+            onFail(`聽到了: "${transcript}"，再試一次吧！`);
+          }
+        };
+
+        this.recognition.onerror = () => {
+          this.isListening = false;
+          micBtn.classList.remove('listening');
+          onFail("沒聽清楚，請靠近麥克風再念一次！");
+        };
+
+        this.recognition.onend = () => {
+          this.isListening = false;
+          micBtn.classList.remove('listening');
+        };
+
+        try {
+          this.recognition.start();
+        } catch (e) {
+          this.recognition.stop();
+        }
+      }
     };
 
-    this.recognition.start();
-  }
-};const QUEST_LIST = [
-  {
-    id: 1,
-    title: "Stage 1: Hello Guide Bear",
-    targetWord: "Hello",
-    sentence: "Hello! What is your name?",
-    expectedReply: "I am Tingting",
-    npcMessage: "Say: 'Hello!' to wake up the island!",
-    rewardType: "badge_1"
-  },
-  {
-    id: 2,
-    title: "Stage 2: Fresh Apples",
-    targetWord: "Apple",
-    sentence: "Pick 3 red apples!",
-    expectedReply: "Apple",
-    npcMessage: "Look at the red fruit and say: 'Apple'!",
-    rewardType: "apple"
-  },
-  {
-    id: 3,
-    title: "Stage 3: Color Meadow",
-    targetWord: "Yellow",
-    sentence: "Feed the sheep a yellow flower.",
-    expectedReply: "Yellow",
-    npcMessage: "Find the yellow flower and say: 'Yellow'!",
-    rewardType: "flower"
-  }
-  // 依序排列到 10 關...
-];
+    /* ==========================================================================
+       4. Three.js 3D 體素地圖搭建
+       ========================================================================== */
+    let scene, camera, renderer, clock;
+    let player, questBeacon;
+    const moveState = { forward: 0, right: 0 };
+    let playerVelocityY = 0;
+    let isGrounded = true;
+
+    // 10 個關卡對應的 3D 地標座標
+    const STAGE_LOCATIONS = [
+      { x: -5, z: 2 },   // 1. 小熊
+      { x: -12, z: -8 }, // 2. 果樹
+      { x: -8, z: 12 },  // 3. 小羊花田
+      { x: -14, z: 6 },  // 4. 兔子草地
+      { x: 0, z: 0 },    // 5. 木橋中央
+      { x: 8, z: -8 },   // 6. 點心小屋
+      { x: 12, z: 2 },   // 7. 修復屋
+      { x: 10, z: 12 },  // 8. 太陽山丘
+      { x: -2, z: -12 }, // 9. 迷宮入口
+      { x: 0, z: 5 }     // 10. 噴泉中央
+    ];
+
+    function init3D() {
+      clock = new THREE.Clock();
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87ceeb);
+      scene.fog = new THREE.Fog(0x87ceeb, 30, 60);
+
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const canvas = document.getElementById('canvas3d');
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+
+      const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+      scene.add(ambient);
+      const sun = new THREE.DirectionalLight(0xfff7d6, 1.1);
+      sun.position.set(20, 35, 15);
+      sun.castShadow = true;
+      scene.add(sun);
+
+      buildIsland();
+      createPlayer();
+      createQuestBeacon();
+      setupControls();
+      updateStageHUD();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+      animate();
+    }
+
+    function buildIsland() {
+      const mat = {
+        grass: new THREE.MeshLambertMaterial({ color: 0x55aa33 }),
+        dirt: new THREE.MeshLambertMaterial({ color: 0x795548 }),
+        wood: new THREE.MeshLambertMaterial({ color: 0x8d6e63 }),
+        water: new THREE.MeshLambertMaterial({ color: 0x4fc3f7, transparent: true, opacity: 0.85 }),
+        roof: new THREE.MeshLambertMaterial({ color: 0xd84315 }),
+        leaves: new THREE.MeshLambertMaterial({ color: 0x2e7d32 })
+      };
+
+      // 主島
+      const island = new THREE.Mesh(new THREE.BoxGeometry(44, 2, 44), mat.grass);
+      island.position.y = -1;
+      island.receiveShadow = true;
+      scene.add(island);
+
+      // 小溪
+      const river = new THREE.Mesh(new THREE.BoxGeometry(6, 2.05, 44), mat.water);
+      river.position.set(0, -0.95, 0);
+      scene.add(river);
+
+      // 木橋
+      for (let i = -3; i <= 3; i++) {
+        const plank = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 4), mat.wood);
+        plank.position.set(i * 0.9, 0.2, 0);
+        scene.add(plank);
+      }
+
+      // 小屋
+      const house = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 6), new THREE.MeshLambertMaterial({ color: 0xfff8e1 }));
+      house.position.set(12, 2, 2);
+      scene.add(house);
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(7, 1.5, 7), mat.roof);
+      roof.position.set(12, 4.5, 2);
+      scene.add(roof);
+
+      // 樹木
+      [ [-12, -8], [-8, 12], [10, -10], [-14, 6] ].forEach(([x, z]) => {
+        const trunk = new THREE.Mesh(new THREE.BoxGeometry(1, 4, 1), mat.wood);
+        trunk.position.set(x, 2, z);
+        scene.add(trunk);
+        const leaves = new THREE.Mesh(new THREE.BoxGeometry(3.5, 3, 3.5), mat.leaves);
+        leaves.position.set(x, 4.5, z);
+        scene.add(leaves);
+      });
+    }
+
+    function createPlayer() {
+      player = new THREE.Group();
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.85, 0.85), new THREE.MeshLambertMaterial({ color: 0xffd54f }));
+      head.position.y = 1.5;
+      player.add(head);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.9, 0.6), new THREE.MeshLambertMaterial({ color: 0x1976d2 }));
+      body.position.y = 0.8;
+      player.add(body);
+
+      player.leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.7, 0.35), new THREE.MeshLambertMaterial({ color: 0x37474f }));
+      player.leftLeg.position.set(-0.25, 0.35, 0);
+      player.add(player.leftLeg);
+
+      player.rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.7, 0.35), new THREE.MeshLambertMaterial({ color: 0x37474f }));
+      player.rightLeg.position.set(0.25, 0.35, 0);
+      player.add(player.rightLeg);
+
+      player.position.set(-8, 0, 4);
+      scene.add(player);
+    }
+
+    function createQuestBeacon() {
+      questBeacon = new THREE.Group();
+      const ring = new THREE.Mesh(new THREE.RingGeometry(1, 1.4, 32), new THREE.MeshBasicMaterial({ color: 0xffd600, side: THREE.DoubleSide }));
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.y = 0.05;
+      questBeacon.add(ring);
+
+      const mark = new THREE.Mesh(new THREE.BoxGeometry(0.35, 1, 0.35), new THREE.MeshBasicMaterial({ color: 0xffeb3b }));
+      mark.position.y = 2.5;
+      questBeacon.add(mark);
+      scene.add(questBeacon);
+    }
+
+    function updateStageHUD() {
+      const q = QUEST_LIST[currentStageIndex];
+      document.getElementById('stage-badge-text').innerText = `Stage ${q.id} / 10`;
+      document.getElementById('mission-desc').innerText = q.instruction;
+
+      const targetPos = STAGE_LOCATIONS[currentStageIndex];
+      questBeacon.position.set(targetPos.x, 0, targetPos.z);
+    }
+
+    /* ==========================================================================
+       5. 操作控制 (鍵盤 & 虛擬搖桿)
+       ========================================================================== */
+    function setupControls() {
+      window.addEventListener('keydown', (e) => {
+        if (['w', 'W', 'ArrowUp'].includes(e.key)) moveState.forward = 1;
+        if (['s', 'S', 'ArrowDown'].includes(e.key)) moveState.forward = -1;
+        if (['a', 'A', 'ArrowLeft'].includes(e.key)) moveState.right = -1;
+        if (['d', 'D', 'ArrowRight'].includes(e.key)) moveState.right = 1;
+        if (e.key === ' ' && isGrounded) {
+          playerVelocityY = 9;
+          isGrounded = false;
+          Sound.playPop();
+        }
+        if (['e', 'E'].includes(e.key)) triggerQuestInteraction();
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (['w', 'W', 'ArrowUp', 's', 'S', 'ArrowDown'].includes(e.key)) moveState.forward = 0;
+        if (['a', 'A', 'ArrowLeft', 'd', 'D', 'ArrowRight'].includes(e.key)) moveState.right = 0;
+      });
+
+      document.getElementById('jump-btn').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (isGrounded) {
+          playerVelocityY = 9;
+          isGrounded = false;
+          Sound.playPop();
+        }
+      });
+      document.getElementById('action-btn').addEventListener('click', triggerQuestInteraction);
+
+      // 搖桿
+      const zone = document.getElementById('joystick-zone');
+      const knob = document.getElementById('joystick-knob');
+      let touchId = null, sX = 0, sY = 0;
+
+      zone.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const t = e.changedTouches[0];
+        touchId = t.identifier;
+        const r = zone.getBoundingClientRect();
+        sX = r.left + r.width / 2;
+        sY = r.top + r.height / 2;
+      });
+
+      window.addEventListener('touchmove', (e) => {
+        if (touchId === null) return;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === touchId) {
+            const t = e.changedTouches[i];
+            const dx = t.clientX - sX;
+            const dy = t.clientY - sY;
+            const dist = Math.min(45, Math.hypot(dx, dy));
+            const rad = Math.atan2(dy, dx);
+            knob.style.transform = `translate(calc(-50% + ${Math.cos(rad) * dist}px), calc(-50% + ${Math.sin(rad) * dist}px))`;
+            moveState.right = (Math.cos(rad) * dist) / 45;
+            moveState.forward = -(Math.sin(rad) * dist) / 45;
+          }
+        }
+      }, { passive: false });
+
+      const resetJoy = () => {
+        touchId = null;
+        knob.style.transform = 'translate(-50%, -50%)';
+        moveState.forward = 0;
+        moveState.right = 0;
+      };
+      window.addEventListener('touchend', resetJoy);
+      window.addEventListener('touchcancel', resetJoy);
+    }
+
+    /* ==========================================================================
+       6. 10 關互動流程與發音辨識
+       ========================================================================== */
+    const promptUI = document.getElementById('interact-prompt');
+    const dialogUI = document.getElementById('dialog-modal');
+
+    function checkProximity() {
+      const targetPos = STAGE_LOCATIONS[currentStageIndex];
+      const dist = player.position.distanceTo(new THREE.Vector3(targetPos.x, 0, targetPos.z));
+      if (dist < 3.2) {
+        promptUI.style.display = 'block';
+      } else {
+        promptUI.style.display = 'none';
+      }
+    }
+
+    function triggerQuestInteraction() {
+      const targetPos = STAGE_LOCATIONS[currentStageIndex];
+      const dist = player.position.distanceTo(new THREE.Vector3(targetPos.x, 0, targetPos.z));
+      if (dist < 3.5) {
+        openQuestModal();
+      }
+    }
+
+    function openQuestModal() {
+      Sound.playPop();
+      const q = QUEST_LIST[currentStageIndex];
+
+      document.getElementById('modal-avatar').innerText = q.npcAvatar;
+      document.getElementById('modal-speaker').innerText = q.speaker;
+      document.getElementById('modal-en').innerText = q.sentence;
+      document.getElementById('modal-zh').innerText = q.chinese;
+      document.getElementById('modal-phonics').innerText = q.phonics;
+      document.getElementById('mic-indicator').innerText = `👇 按下麥克風，大聲念出單字：「${q.targetWord}」！`;
+      document.getElementById('fallback-pass-text').innerText = `🎧 聽音跟讀：「${q.targetWord}」`;
+
+      dialogUI.style.display = 'flex';
+      Voice.speak(q.sentence);
+
+      // 綁定朗讀重播
+      document.getElementById('btn-replay-speech').onclick = () => {
+        Voice.speak(`${q.sentence} ... ${q.targetWord}!`);
+      };
+
+      // 綁定麥克風辨識
+      document.getElementById('btn-mic-record').onclick = () => {
+        SpeechRec.listen(
+          q.targetWord,
+          (word) => {
+            handleStageSuccess(`太棒了！辨識正確：${word}！`);
+          },
+          (err) => {
+            document.getElementById('mic-indicator').innerText = `⚠️ ${err}`;
+            Voice.speak("Try again! Listen carefully!");
+          }
+        );
+      };
+
+      // 綁定備用跟讀通關按鈕
+      document.getElementById('btn-fallback-pass').onclick = () => {
+        Voice.speak(q.targetWord);
+        handleStageSuccess(`完成跟讀：${q.targetWord}！`);
+      };
+    }
+
+    function handleStageSuccess(msg) {
+      Sound.playSuccess();
+      Voice.speak("Great job! Stage clear!");
+      alert(msg);
+      dialogUI.style.display = 'none';
+
+      currentStageIndex++;
+      if (currentStageIndex >= QUEST_LIST.length) {
+        showFinalVictory();
+      } else {
+        updateStageHUD();
+      }
+    }
+
+    function showFinalVictory() {
+      document.getElementById('victory-modal').style.display = 'flex';
+      Sound.playSuccess();
+      Voice.speak("Congratulations! You completed all 10 stages!");
+
+      const container = document.getElementById('summary-word-list');
+      container.innerHTML = QUEST_LIST.map(q => `
+        <div class="summary-item" onclick="Voice.speak('${q.targetWord}')">
+          <span>${q.id}. ${q.targetWord}</span>
+          <span>🔊</span>
+        </div>
+      `).join('');
+    }
+
+    /* ==========================================================================
+       7. 遊戲主迴圈
+       ========================================================================== */
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+
+      // 重力跳躍
+      player.position.y += playerVelocityY * delta;
+      if (player.position.y > 0) {
+        playerVelocityY -= 22 * delta;
+      } else {
+        player.position.y = 0;
+        playerVelocityY = 0;
+        isGrounded = true;
+      }
+
+      // 移動
+      if (moveState.forward !== 0 || moveState.right !== 0) {
+        const moveVec = new THREE.Vector3(moveState.right, 0, -moveState.forward).normalize();
+        player.position.x += moveVec.x * 7.5 * delta;
+        player.position.z += moveVec.z * 7.5 * delta;
+        player.rotation.y = Math.atan2(moveVec.x, moveVec.z);
+
+        player.leftLeg.rotation.x = Math.sin(time * 12) * 0.6;
+        player.rightLeg.rotation.x = -Math.sin(time * 12) * 0.6;
+      } else {
+        player.leftLeg.rotation.x = 0;
+        player.rightLeg.rotation.x = 0;
+      }
+
+      // 視角跟隨
+      camera.position.lerp(new THREE.Vector3(player.position.x, player.position.y + 6.5, player.position.z + 10), 0.08);
+      camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
+
+      // 任務地標旋轉
+      if (questBeacon) {
+        questBeacon.rotation.y += delta * 1.5;
+      }
+
+      checkProximity();
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('load', init3D);
+  </script>
+</body>
+</html>
