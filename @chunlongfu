@@ -1,1 +1,638 @@
 
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>春龍福・慈惠堂炒米粉 Chun Long Fu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#fbeccb;--card:#fff8e6;--ink:#4a2c1a;--mute:#8a6a50;--red:#d9402b;--rk:#fff6e4;--bt:#ffd978;--pk:#f9c4b0;--ok:#2f7a45;--sh:#4a2c1a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+    @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a1a12;--card:#3a261b;--ink:#f6e4c4;--mute:#c9ac8a;--red:#ef6a52;--pk:#7a4636;--sh:#0f0805;--ok:#86d196}}
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:calc(84px + env(safe-area-inset-top,0px))}
+    body{margin:0;color:var(--ink);font:16px/1.7 "Zen Maru Gothic","Noto Sans TC",sans-serif;background:var(--bg) radial-gradient(var(--pk) 1.5px,transparent 1.6px) 0 0/22px 22px}
+    h1,h2,h3{margin:0;line-height:1.3;font-weight:900}
+    button,input,textarea{font:inherit;color:inherit}
+    button{cursor:pointer}
+    :focus-visible{outline:3px dashed var(--red);outline-offset:3px}
+    .wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+    header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--red);border-bottom:4px solid var(--ink)}
+    header .wrap{display:flex;align-items:center;gap:10px;min-height:68px}
+    .logo{display:flex;align-items:center;gap:8px;color:var(--rk);text-decoration:none;font-weight:900;font-size:19px;white-space:nowrap}
+    .mark{height:44px;width:auto;background:var(--rk);border:3px solid var(--ink);border-radius:14px;padding:3px 6px}
+    .logo small{display:block;font-size:10px;letter-spacing:.14em;opacity:.9;line-height:1}
+    nav{display:flex;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none;align-items:center}
+    nav a,.lang{color:var(--ink);background:var(--card);border:2.5px solid var(--ink);border-radius:20px;padding:4px 12px;font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap;box-shadow:2px 2px 0 var(--sh)}
+    .lang{background:var(--bt)}
+    nav a:hover,.lang:hover{transform:translateY(-2px) rotate(-2deg)}
+    .btn{display:inline-block;border:3px solid var(--ink);background:var(--red);color:var(--rk);border-radius:28px;padding:10px 20px;font-weight:900;text-decoration:none;text-align:center;box-shadow:4px 4px 0 var(--sh);transition:transform .1s,box-shadow .1s}
+    .btn:hover{transform:translate(-1px,-2px) rotate(-1deg)}
+    .btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--sh)}
+    .btn.y{background:var(--bt);color:#4a2c1a}
+    .btn.w{background:var(--card);color:var(--ink)}
+    .btn.tel{background:#0084ff;color:#fff}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    .hero{padding:34px 0 26px}
+    .hero .wrap{display:grid;grid-template-columns:1.3fr 1fr;gap:22px;align-items:center}
+    .hero h1{font-size:clamp(34px,7vw,58px);letter-spacing:.05em;color:var(--red);text-shadow:3px 3px 0 var(--bt)}
+    .hero h1 small{display:block;font-size:.32em;color:var(--ink);text-shadow:none;letter-spacing:.12em;margin-top:4px}
+    .hero p{margin:12px 0 18px;max-width:30em}
+    .stks{display:flex;flex-wrap:wrap;gap:12px}
+    .stks .btn{font-size:17px}
+    .mas{justify-self:center;position:relative;width:200px;height:200px;cursor:pointer;border:0;background:none;display:grid;place-items:end center}
+    .face{width:150px;height:118px;background:var(--bt);border:4px solid var(--ink);border-radius:50% 50% 44% 44%;position:relative;z-index:1}
+    .eye{position:absolute;top:44px;width:12px;height:16px;background:var(--ink);border-radius:50%}
+    .eye.l{left:38px}
+    .eye.r{right:38px}
+    .chk{position:absolute;top:66px;width:22px;height:12px;background:var(--pk);border-radius:50%}
+    .chk.l{left:16px}
+    .chk.r{right:16px}
+    .mth{position:absolute;left:62px;top:62px;width:26px;height:14px;border:3px solid var(--ink);border-top:0;border-radius:0 0 26px 26px}
+    .pot{position:absolute;bottom:0;width:176px;height:56px;background:var(--red);border:4px solid var(--ink);border-radius:8px 8px 40px 40px;z-index:2;display:grid;place-items:center;color:var(--rk);font-weight:900;font-size:22px}
+    .steam{position:absolute;bottom:100px;width:14px;height:60px;border-radius:50%;background:radial-gradient(closest-side,var(--card),transparent);filter:blur(4px);opacity:0;animation:rise 3.6s ease-out infinite}
+    .steam:nth-of-type(1){left:62px}
+    .steam:nth-of-type(2){left:93px;animation-delay:1.2s}
+    .steam:nth-of-type(3){left:124px;animation-delay:2.2s}
+    @keyframes rise{0%{transform:translateY(0);opacity:0}30%{opacity:.9}100%{transform:translateY(-50px) scaleX(1.8);opacity:0}}
+    .bub{position:absolute;top:-6px;right:-10px;background:var(--card);border:3px solid var(--ink);border-radius:16px;padding:4px 12px;font-size:14px;font-weight:700;max-width:180px;opacity:0;transition:opacity .2s;z-index:3;text-align:left}
+    .bub.on{opacity:1}
+    .pop{animation:pop .5s}
+    @keyframes pop{30%{transform:scale(1.1,.9)}60%{transform:scale(.95,1.08)}}
+    .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:6px 0 0;padding:0;list-style:none}
+    .steps li{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:10px 14px;box-shadow:4px 4px 0 var(--sh);display:flex;gap:10px;align-items:center;font-weight:700}
+    .steps b{flex:none;width:32px;height:32px;display:grid;place-items:center;background:var(--bt);border:3px solid var(--ink);border-radius:50%}
+    section{padding:30px 0}
+    .ttl{font-size:26px;color:var(--red)}
+    .sub{color:var(--mute);margin:2px 0 16px}
+    .info{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
+    .info div{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:10px 14px;box-shadow:4px 4px 0 var(--sh)}
+    .info b{display:block;color:var(--red)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+    .item{background:var(--card);border:3px solid var(--ink);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:5px 5px 0 var(--sh)}
+    .item h3{font-size:18px}
+    .item p{margin:0;color:var(--mute);font-size:14px;flex:1}
+    .tag{align-self:flex-start;font-size:12px;font-weight:900;background:var(--bt);color:#4a2c1a;border:2px solid var(--ink);border-radius:12px;padding:0 10px}
+    .tag.x{background:var(--pk);color:var(--ink)}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .add{flex:1;min-width:120px;background:var(--red);color:var(--rk);border:3px solid var(--ink);border-radius:20px;padding:7px 10px;font-weight:900;box-shadow:3px 3px 0 var(--sh);transition:transform .1s}
+    .add:active{transform:translate(3px,3px);box-shadow:none}
+    .add small{font-weight:700;opacity:.95}
+    .cold{background:var(--bt);border-block:4px dashed var(--ink);--card:#fff8e6;--ink:#4a2c1a;--mute:#8a6a50}
+    .note{font-size:14px;color:var(--mute)}
+    footer{background:var(--ink);color:#f6e4c4;text-align:center;padding:26px 16px calc(96px + env(safe-area-inset-bottom,0px));font-size:14px}
+    footer a{color:var(--bt)}
+    .fab{position:fixed;z-index:30;bottom:calc(16px + env(safe-area-inset-bottom,0px));border:3px solid var(--ink);border-radius:30px;padding:11px 18px;font-weight:900;box-shadow:4px 4px 0 var(--sh)}
+    #fab{right:14px;background:var(--red);color:var(--rk)}
+    #fabB{left:14px;background:var(--bt);color:#4a2c1a}
+    #fabN{background:var(--rk);color:var(--red);border-radius:12px;padding:1px 8px;margin-left:6px}
+    .veil{position:fixed;inset:0;background:rgba(40,20,8,.55);z-index:40;display:none}
+    .veil.on{display:block}
+    .drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--bg);z-index:50;transform:translateX(105%);transition:transform .25s;display:flex;flex-direction:column;border-left:4px solid var(--ink);padding-top:env(safe-area-inset-top,0px)}
+    .drawer.on{transform:none}
+    .dh{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--red);color:var(--rk);border-bottom:4px solid var(--ink)}
+    .dh h2{font-size:20px}
+    .x{background:none;border:0;color:inherit;font-size:28px;line-height:1}
+    .db{flex:1;overflow-y:auto;padding:14px 16px}
+    .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+    .seg button{border:3px solid var(--ink);background:var(--card);border-radius:20px;padding:9px 4px;font-weight:900;font-size:14px}
+    .seg button.on{background:var(--bt);color:#4a2c1a;box-shadow:3px 3px 0 var(--sh)}
+    .ln{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:9px 0;border-bottom:2px dotted var(--mute)}
+    .ln .n{font-weight:900}
+    .ln .m{font-size:13px;color:var(--mute)}
+    .qty{display:flex;align-items:center;gap:8px;grid-row:span 2;align-self:center}
+    .qty button{width:32px;height:32px;border-radius:50%;border:3px solid var(--ink);background:var(--bt);color:#4a2c1a;font-weight:900}
+    .warn{color:var(--red);font-size:13px;font-weight:900}
+    .bar{height:16px;background:var(--card);border:3px solid var(--ink);border-radius:10px;overflow:hidden;margin:6px 0}
+    .bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(45deg,var(--red) 0 8px,var(--pk) 8px 16px);transition:width .3s}
+    .free{background:var(--card);border:3px solid var(--ink);border-radius:16px;padding:8px 12px;margin:10px 0;font-size:14px}
+    .sum{margin:10px 0}
+    .sum div{display:flex;justify-content:space-between}
+    .sum .t{font-size:20px;font-weight:900;color:var(--red);border-top:3px dashed var(--ink);margin-top:6px;padding-top:6px}
+    label{display:block;font-size:14px;font-weight:900;margin:10px 0 3px}
+    input,textarea{width:100%;padding:9px 12px;border:3px solid var(--ink);background:var(--card);border-radius:14px}
+    .err{color:var(--red);font-size:13px;font-weight:900;min-height:1em}
+    .modal{position:fixed;inset:0;z-index:70;display:none;place-items:center;padding:16px;background:rgba(40,20,8,.6)}
+    .modal.on{display:grid}
+    .mb{background:var(--bg);width:min(520px,100%);max-height:90vh;overflow:auto;border:4px solid var(--ink);border-radius:26px;padding:18px;box-shadow:6px 6px 0 var(--sh)}
+    .mb pre{white-space:pre-wrap;background:var(--card);border:3px dashed var(--ink);border-radius:14px;padding:10px;font:14px/1.6 "Zen Maru Gothic","Noto Sans TC",sans-serif;max-height:30vh;overflow:auto}
+    .notice-box{background:var(--bt);border:2px dashed var(--ink);border-radius:14px;padding:10px 12px;margin:12px 0;font-size:13px;font-weight:700}
+    .line{background:#06c755;color:#fff}
+    .bot{position:fixed;left:14px;bottom:calc(76px + env(safe-area-inset-bottom,0px));width:min(360px,calc(100% - 28px));height:min(70vh,500px);z-index:55;background:var(--bg);border:4px solid var(--ink);border-radius:24px;box-shadow:6px 6px 0 var(--sh);display:none;flex-direction:column;overflow:hidden}
+    .bot.on{display:flex}
+    .bot .dh{background:var(--bt);color:#4a2c1a}
+    .msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+    .m1,.m2{max-width:86%;padding:7px 12px;border:3px solid var(--ink);border-radius:18px;font-size:14px;line-height:1.55;white-space:pre-wrap}
+    .m1{background:var(--card);align-self:flex-start;border-bottom-left-radius:4px}
+    .m2{background:var(--red);color:var(--rk);align-self:flex-end;border-bottom-right-radius:4px}
+    .chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 8px}
+    .chips button{background:var(--card);border:2.5px solid var(--ink);border-radius:16px;padding:2px 10px;font-size:13px;font-weight:700}
+    .chips button:hover{background:var(--bt);color:#4a2c1a}
+    .bi{display:flex;gap:6px;padding:8px;border-top:3px solid var(--ink)}
+    .bi input{flex:1}
+    .bi button{padding:6px 14px}
+    .abt{display:flex;gap:16px;align-items:center;margin-bottom:14px}
+    .lg{height:96px;width:auto;flex:none;background:#f6e7c6;border:3px solid var(--ink);border-radius:22px;padding:8px 12px;box-shadow:4px 4px 0 var(--sh)}
+    .story{display:grid;gap:14px}
+    .ch{display:grid;grid-template-columns:84px 1fr;gap:14px;background:var(--card);border:3px solid var(--ink);border-radius:22px;padding:14px;box-shadow:5px 5px 0 var(--sh)}
+    .yr{align-self:start;text-align:center;background:var(--bt);color:#4a2c1a;border:3px solid var(--ink);border-radius:16px;padding:6px 4px;font-size:16px;font-weight:900}
+    .ch h3{font-size:18px;color:var(--red);margin-bottom:4px}
+    .ch p{margin:0;max-width:44em}
+    @media(max-width:560px){.ch{grid-template-columns:1fr}.yr{justify-self:start;padding:2px 14px}.lg{height:72px}}
+    .pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+    .pills span{background:var(--bt);color:#4a2c1a;border:3px solid var(--ink);border-radius:20px;padding:2px 14px;font-weight:900;font-size:14px;box-shadow:2px 2px 0 var(--sh)}
+    .rv h3{font-size:16px}
+    .rv h3 small{display:block;font-size:12px;color:var(--mute);font-weight:500}
+    .rv a{font-weight:900;color:var(--red);text-decoration:none;align-self:flex-start}
+    .rvcta{margin-top:18px;background:var(--card);border:3px dashed var(--ink);border-radius:22px;padding:14px;display:grid;gap:10px}
+    @media(max-width:720px){.hero .wrap{grid-template-columns:1fr}.mas{order:-1;transform:scale(.8);margin:-14px 0 -24px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="logo" href="#top">
+      <b class="mark" style="font-size:22px;line-height:1;display:grid;place-items:center">福</b>
+      <span>春龍福<small>Since 1974</small></span>
+    </a>
+    <nav aria-label="menu">
+      <a href="#about" data-z="品牌簡介" data-e="About"></a>
+      <a href="#praise" data-z="好評推薦" data-e="Reviews"></a>
+      <a href="#order" data-z="點餐/外帶" data-e="Order"></a>
+      <a href="#ship" data-z="黑貓宅配" data-e="Delivery"></a>
+      <a href="#" id="lineNav" target="_blank" rel="noopener" data-z="LINE 客服" data-e="LINE"></a>
+      <button class="lang" id="lang" aria-label="Language">EN</button>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <h1>春龍福<small data-z="慈惠堂炒米粉・花蓮吉安" data-e="Chun Long Fu Fried Rice Vermicelli · Hualien"></small></h1>
+      <p data-z="傳承半世紀的古早味。蒸籠現炊保溫「濕米粉」，配上招牌特製肉燥。" data-e="Half a century of old-school flavor. Moist vermicelli kept warm in the steamer, topped with our signature braised pork sauce."></p>
+      <div class="stks">
+        <button class="btn" data-go="pick" data-z="🥡 我要外帶" data-e="🥡 Pick-up"></button>
+        <button class="btn y" data-go="ship" data-z="🚚 我要宅配" data-e="🚚 Delivery"></button>
+        <button class="btn w" data-go="bot" data-z="💬 問客服小福" data-e="💬 Ask Fu-Fu"></button>
+      </div>
+    </div>
+    <button class="mas" id="mas" aria-label="Mascot">
+      <i class="steam"></i><i class="steam"></i><i class="steam"></i>
+      <span class="bub" id="bub"></span>
+      <span class="face"><b class="eye l"></b><b class="eye r"></b><b class="chk l"></b><b class="chk r"></b><b class="mth"></b></span>
+      <span class="pot">福</span>
+    </button>
+  </div>
+  <div class="wrap">
+    <ol class="steps">
+      <li><b>1</b><span data-z="選餐點，按「加入」" data-e="Pick dishes, tap Add"></span></li>
+      <li><b>2</b><span data-z="選自取或宅配" data-e="Choose pick-up or delivery"></span></li>
+      <li><b>3</b><span data-z="送出，傳 LINE 確認" data-e="Send via LINE to confirm"></span></li>
+    </ol>
+  </div>
+</div>
+
+<section id="about">
+  <div class="wrap">
+    <div class="abt">
+      <b class="mark" style="font-size:42px;width:74px;height:74px;display:grid;place-items:center;border-radius:20px;border-width:3px">福</b>
+      <div>
+        <h2 class="ttl" data-z="品牌故事：從阿公的小攤車，到爸媽的店" data-e="Our Story: From Grandpa's Cart to Our Family Shop"></h2>
+        <p class="sub" data-z="一碗米粉，三代人的溫度。" data-e="One bowl of vermicelli, three generations of warmth."></p>
+      </div>
+    </div>
+    <div class="story">
+      <article class="ch">
+        <b class="yr">1974</b>
+        <div>
+          <h3 data-z="阿公的小攤車" data-e="Grandpa's little cart"></h3>
+          <p data-z="天還沒亮，阿公就推著小攤車來到花蓮慈惠堂前。蒸籠一掀，白煙升起，豬油香和肉燥香飄滿整條街。來拜拜的長輩、趕著上工的街坊，都端著一碗熱呼呼、濕潤不乾澀的炒米粉。阿公常說：「吃飽，才有力氣過日子。」" data-e="Before dawn, Grandpa pushed his little cart to the front of the Cihui Temple in Hualien. When the steamer lid lifted, white steam rose and the smell of lard and braised pork filled the street. Worshippers and neighbors on their way to work all held a warm, moist bowl of fried vermicelli. Grandpa liked to say, 'A full stomach gives you strength for the day.'"></p>
+        </div>
+      </article>
+      <article class="ch">
+        <b class="yr" data-z="傳承" data-e="Passed on"></b>
+        <div>
+          <h3 data-z="交到爸媽手上" data-e="Handed to Mom and Dad"></h3>
+          <p data-z="爸媽從小跟在攤車旁長大，學會看火候、炒米粉，也學會熬那一鍋肉燥。後來，阿公把鍋鏟和蒸籠交給他們，只叮嚀一句：「味道不能變，料要實在。」從此，爸媽天天凌晨起床，把這句話一碗一碗煮進米粉裡。" data-e="Mom and Dad grew up beside the cart. They learned to read the flame, to fry the vermicelli, and to simmer that pot of braised pork sauce. Then Grandpa passed them the spatula and the steamer with one reminder: 'Never change the taste, and never skimp on the ingredients.' Every dawn since, they have cooked those words into each bowl."></p>
+        </div>
+      </article>
+      <article class="ch">
+        <b class="yr" data-z="今天" data-e="Today"></b>
+        <div>
+          <h3 data-z="有屋頂的家" data-e="A home with a roof"></h3>
+          <p data-z="一碗一碗，一年一年，小攤車終於有了遮風避雨的店面，就在吉安自強路 31 號。招牌換新了，蒸籠依然現炊保溫，熟客一進門就說「老樣子」。現在，我們也想把這份從阿公傳下來的溫度，用冷凍宅配送到遠方的家。" data-e="Bowl by bowl, year by year, the little cart found a shop with a roof, at No. 31 Ziqiang Road in Ji'an. The sign is new, but the steamer still keeps every bowl warm, and regulars walk in saying 'the usual.' Now we want to send that warmth, handed down from Grandpa, to homes far away by frozen delivery."></p>
+        </div>
+      </article>
+    </div>
+    <div class="info">
+      <div><b data-z="地址" data-e="Address"></b><span data-z="花蓮縣吉安鄉自強路 31 號" data-e="No. 31, Ziqiang Rd., Ji'an Township, Hualien County"></span></div>
+      <div><b data-z="營業時間" data-e="Hours"></b><span data-z="06:30–14:00（週一公休）" data-e="06:30–14:00 (closed Mondays)"></span></div>
+      <div><b data-z="電話" data-e="Phone"></b><a href="tel:038523446" style="color:inherit">03-852-3446</a></div>
+    </div>
+  </div>
+</section>
+
+<section id="praise" style="padding-top:0">
+  <div class="wrap">
+    <h2 class="ttl" data-z="⭐ 好評與部落客推薦" data-e="⭐ Reviews & Blogger Picks"></h2>
+    <p class="sub" data-z="以下是各平台食記的重點整理（改寫摘要，非原文），點「看完整食記」可閱讀原文。" data-e="Highlights from food blogs and posts, summarized in our own words. Tap to read the full original."></p>
+    <div class="pills">
+      <span data-z="🔥 假日排隊名店" data-e="🔥 Weekend queue favorite"></span>
+      <span data-z="🏮 近半世紀的老味道" data-e="🏮 Nearly 50 years of flavor"></span>
+      <span data-z="📝 多位部落客推薦" data-e="📝 Loved by food bloggers"></span>
+    </div>
+    <div class="grid" id="gridRv"></div>
+    <div class="rvcta">
+      <b data-z="想看更多顧客真實評價？" data-e="Want more real customer reviews?"></b>
+      <div class="row">
+        <a class="btn" href="https://www.facebook.com/hualienlocalgood" target="_blank" rel="noopener" data-z="👍 到 Facebook 看評價" data-e="👍 See Facebook reviews"></a>
+        <a class="btn y" href="https://www.google.com/maps/search/?api=1&query=%E6%98%A5%E9%BE%8D%E7%A6%8F%20%E6%85%88%E6%83%A0%E5%A0%82%E7%B1%B3%E7%B2%89%E7%82%92%20%E8%8A%B1%E8%93%AE" target="_blank" rel="noopener" data-z="📍 Google 地圖留下評價" data-e="📍 Review us on Google Maps"></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="order" style="padding-top:0">
+  <div class="wrap">
+    <h2 class="ttl" data-z="🥡 在線點餐／外帶預訂" data-e="🥡 Order for Pick-up"></h2>
+    <p class="sub" data-z="預訂後到店取餐，免排隊（尖峰備料需至少提前 20 分鐘預訂）。" data-e="Order ahead and skip the wait (please order at least 20 min in advance)."></p>
+    <div class="grid" id="gridDine"></div>
+    <p class="note" style="margin-top:12px" data-z="小菜（三色蛋、油豆腐、滷蛋）依當日供應，現場時價。" data-e="Side dishes (three-color egg, fried tofu, braised egg) are sold in-store at daily prices."></p>
+  </div>
+</section>
+
+<section class="cold" id="ship">
+  <div class="wrap">
+    <h2 class="ttl" data-z="🚚 全台黑貓低溫宅配" data-e="🚚 Island-wide Cold-chain Delivery"></h2>
+    <p class="sub" data-z="真空冷凍／冷藏，在家重現蒸籠古早味。滿 $1,500 免低溫運費。" data-e="Vacuum-packed, chilled or frozen. Free cold-chain shipping over NT$1,500."></p>
+    <div class="grid" id="gridCold"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      <b>春龍福（慈惠堂炒米粉）</b> Since 1974<br>
+      📍 花蓮縣吉安鄉自強路 31 號・📞 <a href="tel:038523446" style="color:inherit">03-852-3446</a><br>
+      ⏰ 營業時間：06:30–14:00（週一公休）
+    </p>
+    <div style="margin-top: 10px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <a href="https://www.facebook.com/hualienlocalgood" target="_blank" rel="noopener">Facebook 粉專</a>・
+      <a href="#" id="lineFoot" target="_blank" rel="noopener" data-z="LINE 官方客服" data-e="LINE Official Account"></a>・
+      <a href="https://www.google.com/maps/search/?api=1&query=%E6%98%A5%E9%BE%8D%E7%A6%8F%20%E8%8A%B1%E8%93%AE" target="_blank" rel="noopener">Google 地圖</a>
+    </div>
+  </div>
+</footer>
+
+<button class="fab" id="fabB"><span data-z="💬 客服小福" data-e="💬 Fu-Fu Help"></span></button>
+<button class="fab" id="fab"><span data-z="🛒 購物車" data-e="🛒 Cart"></span><b id="fabN">0</b></button>
+<div class="veil" id="veil"></div>
+
+<section class="bot" id="bot" aria-label="Chat">
+  <div class="dh"><h2 data-z="客服小福・24H 自動回覆" data-e="Fu-Fu · 24H Auto-reply"></h2><button class="x" id="botX" aria-label="Close">×</button></div>
+  <div class="msgs" id="msgs" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
+  <div class="bi"><input id="botIn" data-pz="輸入問題…" data-pe="Type a question…"><button class="btn" id="botGo" data-z="送出" data-e="Send"></button></div>
+</section>
+
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="dh"><h2 data-z="我的訂單" data-e="My Order"></h2><button class="x" id="close" aria-label="Close">×</button></div>
+  <div class="db">
+    <div class="seg"><button id="mPick" class="on" data-z="🥡 門市自取" data-e="🥡 Pick-up"></button><button id="mShip" data-z="🚚 黑貓宅配" data-e="🚚 Delivery"></button></div>
+    <div id="lines"></div>
+    <div class="free" id="freeBox" hidden></div>
+    <div class="sum" id="sum"></div>
+    
+    <label for="fName" data-z="姓名 *" data-e="Name *"></label>
+    <input id="fName" autocomplete="name" placeholder="請填寫您的稱呼">
+    
+    <label for="fTel" data-z="電話 *" data-e="Phone *"></label>
+    <input id="fTel" type="tel" inputmode="tel" autocomplete="tel" placeholder="聯絡手機號碼">
+    
+    <div id="pickF">
+      <label for="fTime" data-z="取餐時間 *（06:30–14:00，至少需提前20分鐘）" data-e="Pick-up time * (06:30–14:00, +20m)"></label>
+      <input id="fTime" type="time" min="06:30" max="14:00" step="300">
+    </div>
+    
+    <div id="shipF" hidden>
+      <label for="fAddr" data-z="收件地址 *" data-e="Delivery address *"></label>
+      <input id="fAddr" autocomplete="street-address" placeholder="縣市市區、街道地址">
+      <label for="fDate" data-z="希望到貨日（選填）" data-e="Preferred arrival date (optional)"></label>
+      <input id="fDate" type="date">
+    </div>
+    
+    <label for="fLine" data-z="LINE ID（選填）" data-e="LINE ID (optional)"></label>
+    <input id="fLine" placeholder="方便我們主動確認訂單">
+    
+    <label for="fNote" data-z="備註" data-e="Notes"></label>
+    <textarea id="fNote" rows="2" placeholder="餐點特殊需求（如：辣醬另外裝、湯分開等）"></textarea>
+    
+    <div class="err" id="err" role="alert"></div>
+    <button class="btn" id="submit" style="width:100%;margin-top:6px" data-z="送出訂單" data-e="Place order"></button>
+  </div>
+</aside>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="mb">
+    <h2 style="color:var(--red);font-size:22px" data-z="🎉 訂單已整理完畢！" data-e="🎉 Your order is ready!"></h2>
+    <div class="notice-box">
+      📢 <b>防漏單貼心提醒：</b><br>
+      請點下方按鈕將訂單傳送到春龍福 LINE！<br>
+      ⚡ 若為 <b>10 分鐘內現取急單</b>，送出後請直接撥打電話告知，以免現場忙碌未能即時查看。
+    </div>
+    <pre id="orderTxt"></pre>
+    <div class="row" style="margin-top:12px">
+      <a class="btn line" id="lineGo" target="_blank" rel="noopener" style="flex:2" data-z="🟢 一鍵傳送至 LINE 確認" data-e="Send to LINE"></a>
+      <button class="btn y" id="copy" style="flex:1" data-z="複製訂單" data-e="Copy"></button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <a class="btn tel" href="tel:038523446" style="flex:1" data-z="📞 撥打店內電話確認" data-e="Call 03-852-3446"></a>
+      <button class="btn w" id="mClose" style="flex:1" data-z="返回修改" data-e="Back"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== 店家參數設定 ====================
+// 請替換為春龍福實際的 LINE 官方帳號 ID（保留前面的 @）
+const LINE_ID = "@chunlongfu"; 
+const SHIP_FEE = 180, FREE_AT = 1500;
+
+// 商品清單
+const P = [
+  {id:"mf",g:"d",z:"招牌炒米粉",e:"Signature Fried Vermicelli",dz:"豬油炒香，蒸籠保溫濕潤不乾澀，淋上秘製肉燥。",de:"Lard-fried, steamer-kept moist, topped with secret pork sauce.",o:[["小碗","S",35],["大碗","L",50]]},
+  {id:"nd",g:"d",z:"古早味炒麵",e:"Old-school Fried Noodles",dz:"古早味炒麵，油香紮實。",de:"Classic fried noodles, rich and fragrant.",o:[["小碗","S",35],["大碗","L",50]]},
+  {id:"mx",g:"d",z:"米粉麵綜合",e:"Vermicelli & Noodle Mix",dz:"米粉與麵一次吃到，雙重口感首選。",de:"Both textures in one plate.",o:[["小碗","S",35],["大碗","L",50]]},
+  {id:"bl",g:"d",z:"招牌酸菜豬血湯",e:"Pickled Greens & Pig Blood Soup",dz:"滑嫩新鮮豬血佐清香酸菜與韭菜。",de:"Silky fresh pig blood with tangy greens and chives.",o:[["一碗","Bowl",35]]},
+  {id:"ms",g:"d",z:"綜合湯／貢丸湯",e:"Mixed / Meatball Soup",dz:"清甜湯頭，搭炒米粉最對味。",de:"Light, sweet broth. Perfect with vermicelli.",o:[["一碗","Bowl",35]]},
+  {id:"cj",g:"d",s:1,z:"手工辣椒醬（瓶裝）",e:"Handmade Chili Sauce (jar)",dz:"春龍福自製，可到店購買，也可併單宅配。",de:"Made in-house. Buy in-store or add to delivery.",o:[["瓶","Jar",150]]},
+  {id:"p5",g:"c",z:"【免排隊】經典炒米粉 5 入冷藏包",e:"[Skip the Line] Classic Vermicelli ×5 (chilled)",dz:"附肉燥醬包、自製香蔥油，回家加熱即食。",de:"With pork sauce & scallion oil packs. Just reheat.",o:[["5 入","5 pcs",220]]},
+  {id:"p3",g:"c",z:"【老饕熱銷組】米粉 3 入＋酸菜豬血湯 2 入",e:"[Fan Favorite] 3 Vermicelli + 2 Pig Blood Soup (frozen)",dz:"真空冷凍組，一次備齊米粉與湯品。",de:"Vacuum-frozen set: noodles and soup together.",o:[["一組","Set",320]]},
+  {id:"hs",g:"c",s:1,z:"獨門手炒香辣醬 250g／罐",e:"Signature Stir-fried Chili Sauce 250g",dz:"拌飯拌麵都好用。",de:"Great on rice and noodles.",o:[["罐","Can",150]]}
+];
+
+const FAQ=[
+  {k:/時間|營業|幾點|open|hour|time/i,z:"營業時間 06:30–14:00，週一公休。",e:"We're open 06:30–14:00, closed on Mondays."},
+  {k:/地址|哪裡|在哪|address|where|location/i,z:"花蓮縣吉安鄉自強路 31 號。",e:"No. 31, Ziqiang Rd., Ji'an Township, Hualien County."},
+  {k:/電話|phone|call/i,z:"店內電話：03-852-3446（營業時間內）。",e:"Phone: 03-852-3446 (during opening hours)."},
+  {k:/運費|免運|shipping|fee|freight/i,z:`黑貓低溫宅配運費 $${SHIP_FEE}，滿 $${FREE_AT.toLocaleString()} 免運。`,e:`Cold-chain shipping is NT$${SHIP_FEE}; free over NT$${FREE_AT.toLocaleString()}.`},
+  {k:/宅配|黑貓|寄|deliver|ship/i,z:"冷凍／冷藏料理包可黑貓低溫宅配全台；現做餐點限門市自取。",e:"Frozen/chilled packs ship island-wide by cold-chain. Freshly made dishes are pick-up only."},
+  {k:/保存|加熱|蒸|reheat|store|keep|冷凍|冷藏/i,z:"冷藏包請盡快食用；冷凍組可放冷凍庫保存。收到後依包裝說明加熱即可。",e:"Eat chilled packs soon; frozen sets keep in the freezer. Reheat per the package instructions."},
+  {k:/點餐|訂購|怎麼|如何|order|how|預訂/i,z:"按餐點的「加入」→ 開購物車 → 選自取或宅配 → 填資料 → 送出，再按按鈕傳到 LINE 確認。",e:"Tap Add on dishes → open Cart → choose pick-up or delivery → fill in details → place order, then send via LINE to confirm."},
+  {k:/辣|chili|spicy/i,z:"手工辣椒醬瓶裝 $150，宅配另有手炒香辣醬 250g $150。",e:"Chili sauce jar NT$150; stir-fried chili sauce 250g NT$150."},
+  {k:/付款|付錢|pay|cash|現金/i,z:"到店取餐時付款；宅配付款方式由 LINE 客服與您確認。",e:"Pay at pick-up. For delivery, we'll confirm payment on LINE."},
+  {k:/素|vegetarian|vegan/i,z:"米粉以豬油炒香，肉燥含豬肉，暫無全素選項。",e:"Our vermicelli is fried in lard and topped with pork sauce, so there's no vegetarian option."}
+];
+
+const $ = s => document.querySelector(s), money = n => "NT$" + n.toLocaleString();
+let lang = "zh", cart = [], mode = "pick";
+
+try {
+  const r = JSON.parse(localStorage.getItem("cl-cart") || "[]");
+  if(Array.isArray(r)) cart = r.filter(x => P.some(p => p.id === x.id));
+} catch(e) {}
+try {
+  if(localStorage.getItem("cl-lang") === "en") lang = "en";
+} catch(e) {}
+
+const save = () => {
+  try {
+    localStorage.setItem("cl-cart", JSON.stringify(cart));
+    localStorage.setItem("cl-lang", lang);
+  } catch(e) {}
+};
+
+const L = (z, e) => lang === "zh" ? z : e, nm = p => L(p.z, p.e), canShip = p => p.g === "c" || p.s;
+const lineUrl = "https://line.me/R/ti/p/" + encodeURIComponent(LINE_ID);
+["#lineNav", "#lineFoot"].forEach(s => $(s).href = lineUrl);
+
+function card(p){
+  const t = p.g === "c" ? L("可宅配","Delivery") : p.s ? L("自取／宅配皆可","Pick-up / Delivery") : L("限門市自取","Pick-up only");
+  return `<article class="item">
+    <span class="tag ${p.g === "d" && !p.s ? "x" : ""}">${t}</span>
+    <h3>${nm(p)}</h3>
+    <p>${L(p.dz, p.de)}</p>
+    <div class="row">
+      ${p.o.map((o,i)=>`<button class="add" data-id="${p.id}" data-i="${i}">${L(o[0],o[1])} <small>${money(o[2])}</small> ＋${L("加入","Add")}</button>`).join("")}
+    </div>
+  </article>`;
+}
+
+const RV = [
+  {s:"大心日常分享（Dcard）",u:"https://www.dcard.tw/@agoodlife1986/post/242440306",z:"假日內用外帶都要排隊，多半是在地老顧客。米粉炒麵淋上肉燥吃起來有層次、不油膩；豬血湯新鮮滑順，沒有腥味。",e:"Queues on weekends, mostly locals. The vermicelli and noodles with pork sauce taste layered but not greasy, and the pig blood soup is fresh, smooth and free of any odor."},
+  {s:"大嘴巴菜單王（痞客邦・2021）",u:"https://boda88.pixnet.net/blog/posts/13361715577",z:"整修後環境耳目一新。炒米粉不乾，配肉燥很夠味；豬血湯料實在，大腸湯清甜，物超所值。",e:"The renovated shop feels fresh. The vermicelli isn't dry and the pork sauce is plenty flavorful; the pig blood soup is generous and the intestine soup is clear and sweet."},
+  {s:"去旅行新聞網（2023）",u:"https://tournews.tw/archives/64485",z:"報導這家 1974 年開業的老店味道多年不變，是花蓮人愛的人氣小吃。出餐很快，排隊人龍一下就消化完。",e:"Reports on this shop, open since 1974, whose taste has stayed the same for decades. Service is quick, so long lines clear fast."},
+  {s:"好好玩 FUNIT（2026 花蓮美食推薦）",u:"https://gofunit.com/%E8%8A%B1%E8%93%AE%E7%BE%8E%E9%A3%9F/",z:"列為在地人推薦的吉安美食。豬油拌炒的米粉不會太乾，辣菜脯與三色蛋也值得一試。",e:"Listed as a local-approved Ji'an favorite. Lard-fried vermicelli stays moist, and the spicy pickled radish and three-color egg are worth trying."},
+  {s:"PopDaily 波波黛莉",u:"https://www.popdaily.com.tw/forum/food/1106888",z:"炒米粉與豬血湯必點，小菜也好吃。建議 9 點半左右人較少，吃完還能順道去慈惠堂拜拜。",e:"Fried vermicelli and pig blood soup are musts, and the side dishes are tasty. Fewer people around 9:30, and you can visit the temple afterward."},
+  {s:"冰心問路（痞客邦）",u:"https://iceheart888.pixnet.net/blog/posts/16037027168",z:"老店重新裝潢後明亮可愛，價格依舊親民；炒米粉加一點自製辣椒更加分。",e:"The old shop is bright and cute after its makeover, prices are still friendly, and a little homemade chili makes the vermicelli even better."}
+];
+
+function rv(){
+  $("#gridRv").innerHTML = RV.map(r=>`<article class="item rv">
+    <h3><small>${L("食記・網友推薦","Blog / post")}</small>${r.s}</h3>
+    <p>${L(r.z,r.e)}</p>
+    <a href="${r.u}" target="_blank" rel="noopener noreferrer">${L("看完整食記 ↗","Read full post ↗")}</a>
+  </article>`).join("");
+}
+
+function menu(){
+  $("#gridDine").innerHTML = P.filter(p=>p.g==="d").map(card).join("");
+  $("#gridCold").innerHTML = P.filter(p=>p.g==="c").map(card).join("");
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest(".add");
+  if(!b) return;
+  const p = P.find(x => x.id === b.dataset.id), o = p.o[+b.dataset.i], k = p.id + "|" + o[0], f = cart.find(x => x.k === k);
+  f ? f.q++ : cart.push({k, id: p.id, i: +b.dataset.i, pr: o[2], q: 1});
+  save(); render();
+  $("#fab").classList.remove("pop");
+  void $("#fab").offsetWidth;
+  $("#fab").classList.add("pop");
+});
+
+function calc(){
+  const sub = cart.reduce((s,x)=>s+x.pr*x.q,0), bad = mode === "ship" ? cart.filter(x => !canShip(P.find(p=>p.id===x.id))) : [];
+  const fee = mode === "ship" && sub > 0 && sub < FREE_AT ? SHIP_FEE : 0;
+  return {sub, bad, fee, total: sub + fee};
+}
+
+function render(){
+  const {sub, bad, fee, total} = calc();
+  $("#fabN").textContent = cart.reduce((s,x)=>s+x.q,0);
+  $("#lines").innerHTML = cart.length ? cart.map((x,i)=>{
+    const p = P.find(p=>p.id===x.id), o = p.o[x.i];
+    return `<div class="ln">
+      <div class="n">${nm(p)}</div>
+      <div class="qty">
+        <button data-d="-1" data-i="${i}" aria-label="-">−</button>
+        <span>${x.q}</span>
+        <button data-d="1" data-i="${i}" aria-label="+">＋</button>
+      </div>
+      <div class="m">${L(o[0],o[1])}・${money(x.pr)} → ${money(x.pr*x.q)}${mode==="ship"&&!canShip(p)?`<div class="warn">${L("此品項限門市自取，請移除或改選自取","Pick-up only. Remove it or switch to pick-up.")}</div>`:""}</div>
+    </div>`;
+  }).join("") : `<p class="note">${L("購物車是空的，先挑幾樣吧 🍜","Your cart is empty. Pick something tasty 🍜")}</p>`;
+
+  const fb = $("#freeBox");
+  fb.hidden = !(mode === "ship" && cart.length);
+  if(!fb.hidden){
+    const left = FREE_AT - sub;
+    fb.innerHTML = (left > 0 ? L(`再買 <b>${money(left)}</b> 即可免低溫運費`,`Add <b>${money(left)}</b> more for free cold-chain shipping`) : L("<b>已達免運門檻 🎉</b>","<b>Free shipping unlocked 🎉</b>")) +
+      `<div class="bar"><i style="width:${Math.min(100,sub/FREE_AT*100)}%"></i></div><span class="note">${money(sub)} / ${money(FREE_AT)}</span>`;
+  }
+
+  $("#sum").innerHTML = cart.length ? `<div><span>${L("商品小計","Subtotal")}</span><span>${money(sub)}</span></div>${mode==="ship"?`<div><span>${L("低溫運費","Shipping")}</span><span>${fee?money(fee):L("免運","Free")}</span></div>`:""}<div class="t"><span>${L("合計","Total")}</span><span>${money(total)}</span></div>` : "";
+  $("#pickF").hidden = mode !== "pick";
+  $("#shipF").hidden = mode !== "ship";
+  $("#mPick").classList.toggle("on", mode === "pick");
+  $("#mShip").classList.toggle("on", mode === "ship");
+  $("#submit").disabled = !cart.length || bad.length > 0;
+}
+
+function i18n(){
+  document.documentElement.lang = lang === "zh" ? "zh-Hant" : "en";
+  document.querySelectorAll("[data-z]").forEach(el => el.textContent = lang === "zh" ? el.dataset.z : el.dataset.e);
+  document.querySelectorAll("[data-pz]").forEach(el => el.placeholder = lang === "zh" ? el.dataset.pz : el.dataset.pe);
+  $("#lang").textContent = lang === "zh" ? "EN" : "中文";
+  menu(); rv(); render(); chips();
+}
+
+$("#lang").onclick = () => { lang = lang === "zh" ? "en" : "zh"; save(); i18n(); };
+$("#lines").addEventListener("click", e => {
+  const b = e.target.closest("button[data-d]");
+  if(!b) return;
+  const x = cart[+b.dataset.i];
+  x.q += +b.dataset.d;
+  if(x.q <= 0) cart.splice(+b.dataset.i, 1);
+  save(); render();
+});
+
+$("#mPick").onclick = () => { mode = "pick"; render(); };
+$("#mShip").onclick = () => { mode = "ship"; render(); };
+
+const open = () => { $("#drawer").classList.add("on"); $("#veil").classList.add("on"); $("#drawer").setAttribute("aria-hidden","false"); };
+const shut = () => { $("#drawer").classList.remove("on"); $("#veil").classList.remove("on"); $("#drawer").setAttribute("aria-hidden","true"); };
+$("#fab").onclick = open; $("#close").onclick = shut; $("#veil").onclick = shut;
+document.addEventListener("keydown", e => { if(e.key === "Escape"){ shut(); $("#modal").classList.remove("on"); $("#bot").classList.remove("on"); } });
+
+document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => {
+  const g = b.dataset.go;
+  if(g === "bot") return botOpen();
+  mode = g; render(); $(g === "pick" ? "#order" : "#ship").scrollIntoView();
+});
+
+const says = [["今天也要吃飽飽！","Eat well today!"],["肉燥最香啦～","The pork sauce is the best!"],["蒸籠熱呼呼","Hot from the steamer!"],["週一要休息喔","We rest on Mondays!"]];
+let si = 0;
+$("#mas").onclick = () => {
+  const s = says[si++ % says.length], m = $("#mas"), b = $("#bub");
+  b.textContent = L(s[0], s[1]); b.classList.add("on");
+  m.classList.remove("pop"); void m.offsetWidth; m.classList.add("pop");
+  setTimeout(() => b.classList.remove("on"), 2200);
+};
+
+// 客服小福
+const add = (c,t) => { const d = document.createElement("div"); d.className = c; d.textContent = t; $("#msgs").append(d); $("#msgs").scrollTop = 1e9; };
+function chips(){
+  const q = [["營業時間","Hours"],["地址","Address"],["怎麼點餐","How to order"],["宅配運費","Shipping fee"],["保存加熱","Storage"],["付款方式","Payment"]];
+  $("#chips").innerHTML = q.map(a => `<button>${L(a[0],a[1])}</button>`).join("");
+}
+$("#chips").onclick = e => { if(e.target.tagName === "BUTTON") ask(e.target.textContent); };
+function ask(t){
+  t = t.trim(); if(!t) return; add("m2", t);
+  const f = FAQ.find(x => x.k.test(t));
+  setTimeout(() => add("m1", f ? L(f.z, f.e) : L("這個問題我還不確定 🥲 請點下方 LINE 找真人客服，或來電 03-852-3446（06:30–14:00）。","I'm not sure about that 🥲 Please message us on LINE or call 03-852-3446 (06:30–14:00).") + "\n" + lineUrl), 350);
+}
+function botOpen(){
+  $("#bot").classList.add("on");
+  if(!$("#msgs").children.length) add("m1", L("嗨，我是客服小福 🐷 24 小時自動回覆，常見問題都可以問我！訂單確認請以 LINE 真人回覆為準。","Hi, I'm Fu-Fu 🐷 I auto-reply 24/7 to common questions. Order confirmation comes from a real person on LINE."));
+}
+$("#fabB").onclick = () => $("#bot").classList.contains("on") ? $("#bot").classList.remove("on") : botOpen();
+$("#botX").onclick = () => $("#bot").classList.remove("on");
+$("#botGo").onclick = () => { ask($("#botIn").value); $("#botIn").value = ""; };
+$("#botIn").onkeydown = e => { if(e.key === "Enter" && !e.isComposing) $("#botGo").click(); };
+
+// ==================== 送單邏輯（強化語音朗讀與時間限制） ====================
+let text = "";
+$("#submit").onclick = () => {
+  const v = id => $(id).value.trim(), {sub, fee, total} = calc(), err =$("#err"), name = v("#fName"), tel = v("#fTel");
+  if(!name) return err.textContent = L("請填寫姓名","Please enter your name");
+  if(!/^[0-9+\-\s()]{8,}$/.test(tel)) return err.textContent = L("請填寫正確電話","Please enter a valid phone number");
+  
+  const now = new Date();
+  const pad = n => String(n).padStart(2, "0");
+
+  if(mode === "pick"){
+    const t = v("#fTime");
+    if(!t) return err.textContent = L("請選擇取餐時間","Please choose a pick-up time");
+    if(t < "06:30" || t > "14:00") return err.textContent = L("取餐時間需在營業時間內（06:30–14:00）","Pick-up must be 06:30–14:00");
+    
+    // 計算防呆：預約時間至少需要距離當前時間 20 分鐘以上
+    const curMinutes = now.getHours() * 60 + now.getMinutes();
+    const [th, tm] = t.split(":").map(Number);
+    const pickMinutes = th * 60 + tm;
+    if(now.getHours() >= 6 && now.getHours() < 14 && (pickMinutes - curMinutes < 20)){
+      return err.textContent = L("現場備料需時間，取餐時間至少需在 20 分鐘後！急單請直接來電 03-852-3446","Please order at least 20 mins ahead! For urgent orders, call 03-852-3446 directly.");
+    }
+  } else if(!v("#fAddr")){
+    return err.textContent = L("請填寫收件地址","Please enter a delivery address");
+  }
+  
+  err.textContent = "";
+  const no = "#" + pad(now.getMonth()+1) + pad(now.getDate()) + "-" + pad(now.getHours()) + pad(now.getMinutes());
+  
+  // 第一行帶有「春龍福新訂單」以及取餐規格，利於手機語音過濾與朗讀
+  const head = mode === "pick" 
+    ? `【春龍福新訂單】🥡【自取 ${v("#fTime")}】${no}｜${name}｜${money(total)}`
+    : `【春龍福新訂單】🚚【黑貓低溫宅配】${no}｜${name}｜${money(total)}`;
+  
+  const Ls = [head, "────────────", "【訂購餐點品項】"];
+  cart.forEach(x => {
+    const p = P.find(p => p.id === x.id);
+    Ls.push(`• ${p.z}（${p.o[x.i][0]}）× ${x.q} 碗/份 ＝ ${money(x.pr * x.q)}`);
+  });
+  Ls.push("────────────", `商品小計：${money(sub)}`);
+  if(mode === "ship") Ls.push(`低溫運費：${fee ? money(fee) : "免運"}`);
+  Ls.push(`應付總額：${money(total)}`, "", `訂購姓名：${name}`, `聯絡電話：${tel}`);
+  if(mode === "ship"){
+    Ls.push(`收件地址：${v("#fAddr")}`);
+    if(v("#fDate")) Ls.push(`希望到貨日：${v("#fDate")}`);
+  }
+  if(v("#fLine")) Ls.push(`LINE ID：${v("#fLine")}`);
+  if(v("#fNote")) Ls.push(`訂單備註：${v("#fNote")}`);
+  
+  text = Ls.join("\n");
+  $("#orderTxt").textContent = text;
+  
+  // 兼顧手機 App 與桌機的最佳 LINE 跳轉協定
+  $("#lineGo").href = `https://line.me/R/oaMessage/${LINE_ID}/?${encodeURIComponent(text)}`;
+  $("#modal").classList.add("on");
+};
+
+// 點擊「一鍵傳送」時同步將文字複製到剪貼簿（防止部分裝置未自動帶入）
+$("#lineGo").addEventListener("click", () => {
+  try { navigator.clipboard.writeText(text).catch(()=>{}); } catch(e){}
+});
+
+$("#mClose").onclick = () => $("#modal").classList.remove("on");
+
+$("#copy").onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(text);
+    $("#copy").textContent = L("已複製！可直接到 LINE 貼上","Copied!");
+    setTimeout(() => $("#copy").textContent = L("複製訂單","Copy"), 2000);
+  } catch(e) {
+    const r = document.createRange();
+    r.selectNodeContents($("#orderTxt"));
+    const s = getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+    $("#copy").textContent = L("請長按複製","Press & copy");
+  }
+};
+
+i18n();
+</script>
+</body>
+</html>
